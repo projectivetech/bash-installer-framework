@@ -18,22 +18,26 @@ function dictSet() {
 function dictGet() {
   assert_eq $# 2
   local dict=$1 key=$2
-  local value="${dict}_${key}"
-  printf '%s' "${!value}"
+  local gvar="${dict}_${key}"
+
+  # Check for entry existence.
+  assert_variable_exists ${gvar}
+
+  printf '%s' "${!gvar}"
 }
 
 function dictToFile() {
   assert_eq $# 1
   local dict=$1
   local file=".${dict}.status"
-  local keys=$(compgen -A variable | grep ${dict})
+  local gvars=$(compgen -A variable | grep ${dict})
 
   # Print all variables to files.
   (
     echo "#!/usr/bin/env bash"
-    for key in $keys
+    for gvar in $gvars
     do
-      echo "${key}=\"${!key}\""
+      echo "${gvar}=\"${!gvar}\""
     done
   ) > $file
 }
