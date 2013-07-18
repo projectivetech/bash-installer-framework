@@ -84,3 +84,13 @@ function assert_eq() {
 
   assert "${1} -eq ${2}"
 }
+
+function assert_function() {
+  if [ $# -ne 1 ]
+  then
+    _assert_fail "assert_function called with wrong number of parameter!"
+  fi
+
+  local func=$1
+  assert "\"$(type -t ${func})\" == \"function\""
+}

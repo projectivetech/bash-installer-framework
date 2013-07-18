@@ -73,18 +73,43 @@ function task_status() {
   done
 }
 
-# Returns $TRUE if all tasks are done, false otherwise.
-function all_tasks_done?() {
-  for task in ${TASKS[@]}
-  do
-    if [ $(dictGet ${task} "status") != ${T_STATUS_DONE} ]; then
+# Iterator function for tasks. 
+# Callbacks may return ${FALSE} to stop the iteration, ${TRUE} otherwise.
+# Return ${TRUE} if all callback calls succeeded, ${FALSE} otherwise.
+function tasks_each() {
+  assert_eq $# 1
+  assert_function $1
+  local func=$1
+
+  for task in ${TASKS[@]}; do
+    ${func} ${task}
+    if [ $? -eq ${FALSE} ]; then
       return ${FALSE}
     fi
   done
+
   return ${TRUE}
 }
 
-# Returns $TRUE if all dependencies of a task are done, false otherwise.
+# Returns ${TRUE} if a task has been completed, ${FALSE} otherwise.
+function task_done?() {
+  assert_eq $# 1
+  local task=$1
+
+  if [ $(dictGet ${task} "status") != ${T_STATUS_DONE} ]; then
+    return ${FALSE}
+  else
+    return ${TRUE}
+  fi
+}
+
+# Returns ${TRUE} if all tasks are done, ${FALSE} otherwise.
+function all_tasks_done?() {
+  tasks_each "task_done?"
+  return $?
+}
+
+# Returns ${TRUE} if all dependencies of a task are done, ${FALSE} otherwise.
 function all_dependencies_done?() {
   assert_eq $# 1
   local master=$1
@@ -108,7 +133,6 @@ function all_dependencies_done?() {
 # Runs a tasks and saves the results.
 function run_task() {
   assert_eq $# 1
-
   local task=$1 
   local shortname=$(dictGet ${task} "shortname")
 

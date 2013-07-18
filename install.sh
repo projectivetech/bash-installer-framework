@@ -14,23 +14,7 @@ function installation_incomplete() {
 
 # Automatic installation.
 function run_installation() {
-  for task in ${TASKS[@]}
-  do
-    # Already completed?
-    if [ $(dictGet ${task} "status") -eq ${T_STATUS_DONE} ]; then
-      continue
-    fi
-
-    run_task ${task}
-
-    if [ $? -ne ${E_SUCCESS} ]; then
-      # Ask the user whether she would like to skip the failed task.
-      ask "Would you like to continue with the installation anyway?"
-      if [ $? -eq ${FALSE} ]; then
-        break
-      fi
-    fi
-  done
+  tasks_each "run_installation_task"
 
   all_tasks_done?
   if [ $? -eq ${TRUE} ]; then
@@ -39,6 +23,26 @@ function run_installation() {
   else
     installation_incomplete
     return ${E_FAILURE}
+  fi
+}
+
+function run_installation_task() {
+  local task=$1
+
+  # Already completed?
+  if [ $(dictGet ${task} "status") -eq ${T_STATUS_DONE} ]; then
+    return ${TRUE}
+  fi
+
+  run_task ${task}
+
+  # Failure?
+  if [ $? -ne ${E_SUCCESS} ]; then
+    # Ask the user whether she would like to skip the failed task.
+    ask "Would you like to continue with the installation anyway?"
+    return $?
+  else
+    return ${TRUE}
   fi
 }
 
