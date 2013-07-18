@@ -1,3 +1,33 @@
+############################## Global configuration ###########################
+
+# Set to 1 to allow only the root user to execute the script.
+ROOT_ONLY=0
+
+############################## Initial checks #################################
+
+# bash => 3.
+if [ -z ${BASH} ]; then
+  echo "Please run the script using the bash interpreter"
+  exit 1
+else
+  bash_major_version=${BASH_VERSION:0:1}
+  if [ ${bash_major_version} -lt 3 ]; then
+    echo "Please run the script using bash version 3 or greater"
+    exit 1
+  fi
+fi
+
+# root.
+if [ ${ROOT_ONLY} -gt 0 ] && [ ${USER} != "root" ]; then
+  echo "Please run the script as root user"
+  exit 1
+fi
+
+# Tools.
+grep -V >/dev/null 2>&1 || { echo "Please install 'grep'"; exit 1; }
+sed --version >/dev/null 2>&1 || { echo "Please install 'sed'"; exit 1; }
+date --version >/dev/null 2>&1 || { echo "Please install 'date'"; exit 1; }
+
 ############################## Some functions #################################
 
 function welcome() {
@@ -47,12 +77,6 @@ function run_installation_task() {
 }
 
 ############################## Main app #######################################
-
-# Some initial checks
-
-# TODO: Check for bash + version.
-# TODO: Check for root.
-# TODO: Check for every utility we need (date, grep, sed, awk, ...).
 
 # Print the welcome message.
 welcome
