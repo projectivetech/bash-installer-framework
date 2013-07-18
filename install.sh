@@ -132,7 +132,7 @@ else
     else
       for task in ${TASKS[@]}
       do
-        if [ "${opt}" = $(dictGet ${task} "shortname") ]; then
+        if [ "${opt}" = "$(dictGet ${task} "shortname")" ]; then
           run_task ${task}
           task_status
         fi
