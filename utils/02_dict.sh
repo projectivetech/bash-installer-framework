@@ -12,7 +12,7 @@
 function dictSet() {
   assert_eq $# 3
   local dict=$1 key=$2 value=$3
-  eval "${dict}_${key}=\"$value\""
+  eval "${dict}_${key}=\"$value\"" # s/eval/evil/
 }
 
 function dictGet() {
