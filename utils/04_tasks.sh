@@ -95,3 +95,14 @@ function task_status() {
     printf '%s\n' "${status}"
   done
 }
+
+# Returns $TRUE if all tasks are done, false otherwise.
+function all_tasks_done?() {
+  for task in ${TASKS[@]}
+  do
+    if [ $(dictGet ${task} "status") != T_STATUS_DONE ]; then
+      return ${FALSE}
+    fi
+  done
+  return ${TRUE}
+}

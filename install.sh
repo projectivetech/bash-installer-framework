@@ -1,5 +1,17 @@
 ############################## Some functions #################################
 
+function welcome() {
+  echo "Welcome."
+}
+
+function installation_complete() {
+  echo "Installation complete."
+}
+
+function installation_incomplete() {
+  echo "Installation incomplete."
+}
+
 # Automatic installation.
 function run_installation() {
   for task in ${TASKS[@]}
@@ -12,11 +24,35 @@ function run_installation() {
     run_task ${task}
 
     if [ $? -ne ${E_SUCCESS} ]; then
-      return ${E_FAILURE}
+      # Ask the user whether she would like to skip the failed task.
+      echo "Would you like to continue with the installation anyway?"
+      select yn in "Yes" "No"; do
+        case ${yn} in
+          "Yes")
+            abort=${FALSE}
+            break
+            ;;
+          "No")
+            abort=${TRUE}
+            break
+            ;;
+        esac
+      done
+
+      if [ ${abort} -eq ${TRUE} ]; then
+        break
+      fi
     fi
   done
 
-  return ${E_SUCCESS}
+  all_tasks_done?
+  if [ $? -eq ${TRUE} ]; then
+    installation_complete
+    return ${E_SUCCESS}
+  else
+    installation_incomplete
+    return ${E_FAILURE}
+  fi
 }
 
 ############################## Main app #######################################
@@ -26,6 +62,9 @@ function run_installation() {
 # TODO: Check for bash + version.
 # TODO: Check for root.
 # TODO: Check for every utility we need (date, grep, sed, awk, ...).
+
+# Print the welcome message.
+welcome
 
 # Load our utility modules.
 UTILS_DIR="utils"
@@ -49,7 +88,7 @@ log_info "Reading command line arguments..."
 if [ $# -ge 1 ]
 then
   
-  # TODO: Automatic installation.
+  # TODO: Fully Automatic installation.
   echo "TODO"
 
 else
