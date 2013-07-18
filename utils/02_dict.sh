@@ -26,6 +26,18 @@ function dictGet() {
   printf '%s' "${!gvar}"
 }
 
+function dictIsSet?() {
+  assert_eq $# 2
+  local dict=$1 key=$2
+  local gvar="${dict}_${key}"
+
+  if [ -z "${!gvar}" ]; then
+    return ${FALSE}
+  else
+    return ${TRUE}
+  fi
+}
+
 function dictToFile() {
   assert_eq $# 1
   local dict=$1

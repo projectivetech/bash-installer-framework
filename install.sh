@@ -25,21 +25,8 @@ function run_installation() {
 
     if [ $? -ne ${E_SUCCESS} ]; then
       # Ask the user whether she would like to skip the failed task.
-      echo "Would you like to continue with the installation anyway?"
-      select yn in "Yes" "No"; do
-        case ${yn} in
-          "Yes")
-            abort=${FALSE}
-            break
-            ;;
-          "No")
-            abort=${TRUE}
-            break
-            ;;
-        esac
-      done
-
-      if [ ${abort} -eq ${TRUE} ]; then
+      ask "Would you like to continue with the installation anyway?"
+      if [ $? -eq ${FALSE} ]; then
         break
       fi
     fi

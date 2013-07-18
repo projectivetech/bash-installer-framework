@@ -53,29 +53,6 @@ function load_task() {
   TASKS+=(${taskname})
 }
 
-# Runs a tasks and saves the results.
-function run_task() {
-  assert_eq $# 1
-
-  local task=$1
-
-  # Run the task.
-  ${task}_run
-  local result=$?
-
-  # Save the status.
-  dictToFile ${task}
-
-  # At least some output.
-  if [ ${result} -ne ${E_SUCCESS} ]; then
-    echo $(dictGet ${task} "shortname")" FAILED (see "$(dictGet "log" "file")")"
-    return ${E_FAILURE}
-  else
-    echo $(dictGet ${task} "shortname")" DONE"
-    return ${E_SUCCESS}
-  fi
-}
-
 # Prints the task status screen.
 function task_status() {
   assert_eq $# 0
@@ -100,9 +77,64 @@ function task_status() {
 function all_tasks_done?() {
   for task in ${TASKS[@]}
   do
-    if [ $(dictGet ${task} "status") != T_STATUS_DONE ]; then
+    if [ $(dictGet ${task} "status") != ${T_STATUS_DONE} ]; then
       return ${FALSE}
     fi
   done
   return ${TRUE}
+}
+
+# Returns $TRUE if all dependencies of a task are done, false otherwise.
+function all_dependencies_done?() {
+  assert_eq $# 1
+  local master=$1
+
+  # Does the task specify any dependencies?
+  dictIsSet? ${master} "dependencies"
+  if [ $? -eq ${FALSE} ]; then
+    return ${TRUE}
+  fi
+
+  local dependencies=$(dictGet ${master} "dependencies")
+  for dependency in ${dependencies}; do
+    if [ $(dictGet ${dependency} "status") != ${T_STATUS_DONE} ]; then
+      return ${FALSE}
+    fi
+  done
+
+  return ${TRUE}
+}
+
+# Runs a tasks and saves the results.
+function run_task() {
+  assert_eq $# 1
+
+  local task=$1 
+  local shortname=$(dictGet ${task} "shortname")
+
+  # Check whether the dependencies are met.
+  all_dependencies_done? ${task}
+  if [ $? -eq ${FALSE} ]; then
+    # Ask the user whether he really would like to continue.
+    ask "Task ${shortname} has unsatisfied dependencies. Would you really like to run it?"
+    if [ $? -eq ${FALSE} ]; then
+      return ${E_FAILURE}
+    fi    
+  fi
+
+  # Run the task.
+  ${task}_run
+  local result=$?
+
+  # Save the status.
+  dictToFile ${task}
+
+  # At least some output.
+  if [ ${result} -ne ${E_SUCCESS} ]; then
+    echo $(dictGet ${task} "shortname")" FAILED (see "$(dictGet "log" "file")")"
+    return ${E_FAILURE}
+  else
+    echo $(dictGet ${task} "shortname")" DONE"
+    return ${E_SUCCESS}
+  fi
 }
