@@ -11,6 +11,8 @@ function ganja_harvesting_run() {
   log_info "Cutting the plants..."
 
   if [ -f "scissors" ]; then
+    touch "two.joints.in.the.morning"
+    
     dictSet "ganja_harvesting" "status" ${T_STATUS_DONE}
     return ${E_SUCCESS}
   else
