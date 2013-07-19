@@ -6,6 +6,5 @@ function ganja_seeding_init() {
 
 function ganja_seeding_run() {
   log_info "Seeding some plants..."
-  task_done! "ganja_seeding"
   return ${E_SUCCESS}
 }

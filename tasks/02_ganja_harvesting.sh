@@ -9,12 +9,9 @@ function ganja_harvesting_run() {
 
   if [ -f "scissors" ]; then
     touch "two.joints.in.the.morning"
-    
-    task_done! "ganja_harvesting"
     return ${E_SUCCESS}
   else
     log_error "Missing scissors. Please touch the scissors."
-    task_failed! "ganja_harvesting"
     return ${E_FAILURE}
   fi
 }

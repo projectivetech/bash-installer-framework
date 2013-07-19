@@ -73,26 +73,6 @@ function task_setup() {
   dictSet ${task} "status" ${T_STATUS_NOT_RUN}
 }
 
-# Prints the task status screen.
-function tasks_status() {
-  assert_eq $# 0
-
-  pad=$(printf '%0.1s' "."{1..80})
-  padlength=60
-  printf "STATUS:\n"
-  printf '%0.1s' "="{1..60}
-  printf '\n'
-  for task in ${TASKS[@]}
-  do
-    local description=$(dictGet ${task} "description")
-    local statuscode=$(dictGet ${task} "status")
-    local status=" ["$(status_msg ${statuscode})"]"
-    printf '%s ' "${description}"
-    printf '%*.*s' 0 $((${padlength} - ${#description} - 1 - ${#status})) "${pad}"
-    printf '%s\n' "${status}"
-  done
-}
-
 # Iterator function for tasks. 
 # Callbacks may return ${FALSE} to stop the iteration, ${TRUE} otherwise.
 # Return ${TRUE} if all callback calls succeeded, ${FALSE} otherwise.
@@ -149,6 +129,14 @@ function all_dependencies_done?() {
   return ${TRUE}
 }
 
+# Retrieve the status of a task a human-readable text.
+function task_status_msg() {
+  assert_eq $# 1
+  local task=$1
+  local status=$(dictGet ${task} "status")
+  status_msg ${status}
+}
+
 # Set task status to done.
 function task_done!() {
   assert_eq $# 1
@@ -161,6 +149,25 @@ function task_failed!() {
   assert_eq $# 1
   local task=$1
   dictSet ${task} "status" ${T_STATUS_FAILED}
+}
+
+# Prints the task status screen.
+function tasks_status() {
+  assert_eq $# 0
+
+  pad=$(printf '%0.1s' "."{1..80})
+  padlength=60
+  printf "STATUS:\n"
+  printf '%0.1s' "="{1..60}
+  printf '\n'
+  for task in ${TASKS[@]}
+  do
+    local description=$(dictGet ${task} "description")
+    local status=" ["$(task_status_msg ${task})"]"
+    printf '%s ' "${description}"
+    printf '%*.*s' 0 $((${padlength} - ${#description} - 1 - ${#status})) "${pad}"
+    printf '%s\n' "${status}"
+  done
 }
 
 # Runs a tasks and saves the results.
@@ -182,15 +189,17 @@ function run_task() {
   ${task}_run
   local result=$?
 
+  # Update the status.
+  if [ ${result} -ne ${E_SUCCESS} ]; then
+    task_failed! ${task}
+  else
+    task_done! ${task}
+  fi
+
   # Save the status.
   dictToFile ${task}
 
   # At least some output.
-  if [ ${result} -ne ${E_SUCCESS} ]; then
-    echo $(dictGet ${task} "shortname")" FAILED (see "$(dictGet "log" "file")")"
-    return ${E_FAILURE}
-  else
-    echo $(dictGet ${task} "shortname")" DONE"
-    return ${E_SUCCESS}
-  fi
+  echo $(dictGet ${task} "shortname")": "$(task_status_msg ${task})
+  return ${result}
 }
