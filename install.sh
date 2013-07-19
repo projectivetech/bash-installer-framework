@@ -111,7 +111,7 @@ else
   tasks_status
 
   # Give the user a nice looping main menu!
-  options=("Continue the installation")
+  options=("Run the installation")
   for task in ${TASKS[@]}
   do
     shortname=$(dictGet ${task} "shortname")
@@ -123,7 +123,7 @@ else
   printf "\nWhat would you like to do today:\n"
   select opt in "${options[@]}"
   do
-    if [ "${opt}" =  "Continue the installation" ]; then
+    if [ "${opt}" =  "Run the installation" ]; then
       run_installation
       tasks_status
     elif [ "${opt}" = "Exit (Ctrl+D)" ]; then
