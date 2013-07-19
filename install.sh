@@ -45,9 +45,8 @@ function installation_incomplete() {
 # Automatic installation.
 function run_installation() {
   tasks_each "run_installation_task"
-
-  all_tasks_done?
-  if [ $? -eq ${TRUE} ]; then
+  
+  if all_tasks_done?; then
     installation_complete
     return ${E_SUCCESS}
   else

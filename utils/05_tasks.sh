@@ -115,8 +115,7 @@ function all_dependencies_done?() {
   local master=$1
 
   # Does the task specify any dependencies?
-  dictIsSet? ${master} "dependencies"
-  if [ $? -eq ${FALSE} ]; then
+  if ! dictIsSet? ${master} "dependencies"; then
     return ${TRUE}
   fi
 
@@ -137,11 +136,10 @@ function run_task() {
   local shortname=$(dictGet ${task} "shortname")
 
   # Check whether the dependencies are met.
-  all_dependencies_done? ${task}
-  if [ $? -eq ${FALSE} ]; then
+  if ! all_dependencies_done? ${task}; then
     # Ask the user whether he really would like to continue.
     ask "Task ${shortname} has unsatisfied dependencies. Would you really like to run it?"
-    if [ $? -eq ${FALSE} ]; then
+    if [ $? -eq ${NO} ]; then
       return ${E_FAILURE}
     fi    
   fi

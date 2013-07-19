@@ -2,6 +2,9 @@
 
 # Some user interface functionality.
 
+YES=${TRUE}
+NO=${FALSE}
+
 # Ask the user a yes/no question.
 # Returns ${TRUE} for yes, ${FALSE} for no.
 # If the user aborts the question by hitting
