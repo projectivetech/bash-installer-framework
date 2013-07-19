@@ -94,7 +94,7 @@ log_init
 log_info "Loading tasks..."
 for task in `ls -1 ${TASKS_DIR}`
 do
-  load_task ${task}
+  task_load ${task}
 done
 
 # Read command line arguments.
@@ -108,7 +108,7 @@ then
 else
 
   # Print the status.
-  task_status
+  tasks_status
 
   # Give the user a nice looping main menu!
   options=("Continue the installation")
@@ -125,7 +125,7 @@ else
   do
     if [ "${opt}" =  "Continue the installation" ]; then
       run_installation
-      task_status
+      tasks_status
     elif [ "${opt}" = "Exit (Ctrl+D)" ]; then
       exit ${E_SUCCESS}
     else
@@ -133,7 +133,7 @@ else
       do
         if [ "${opt}" = "$(dictGet ${task} "shortname")" ]; then
           run_task ${task}
-          task_status
+          tasks_status
         fi
       done
     fi

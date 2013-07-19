@@ -37,7 +37,7 @@ function status_msg() {
 }
 
 # Loads the tasks from their files.
-function load_task() {
+function task_load() {
   assert_eq $# 1
 
   local taskname=$(echo ${task} | sed 's/^[0-9]*\_//' | sed 's/\.sh//')
@@ -53,8 +53,28 @@ function load_task() {
   TASKS+=(${taskname})
 }
 
+# Setup a task, create variables.
+# Example:
+# task_setup "name" "shortname" "description"
+# task_setup "name" "shortname" "description" "dependencies"
+function task_setup() {
+  assert "$# -ge 3"
+  assert "$# -le 4"
+
+  local task=$1 shortname=$2 description=$3
+  dictSet ${task} "shortname" "${shortname}"
+  dictSet ${task} "description" "${description}"
+
+  if [ $# -eq 4 ]; then
+    local dependencies=$4
+    dictSet ${task} "dependencies" "${dependencies}"
+  fi
+
+  dictSet ${task} "status" ${T_STATUS_NOT_RUN}
+}
+
 # Prints the task status screen.
-function task_status() {
+function tasks_status() {
   assert_eq $# 0
 
   pad=$(printf '%0.1s' "."{1..80})
@@ -127,6 +147,20 @@ function all_dependencies_done?() {
   done
 
   return ${TRUE}
+}
+
+# Set task status to done.
+function task_done!() {
+  assert_eq $# 1
+  local task=$1
+  dictSet ${task} "status" ${T_STATUS_DONE}
+}
+
+# Set task status to failure.
+function task_failed!() {
+  assert_eq $# 1
+  local task=$1
+  dictSet ${task} "status" ${T_STATUS_FAILED}
 }
 
 # Runs a tasks and saves the results.

@@ -1,14 +1,11 @@
 #!/usr/bin/env bash
 
 function ganja_seeding_init() {
-  dictSet "ganja_seeding" "status" ${T_STATUS_NOT_RUN}
-  dictSet "ganja_seeding" "shortname" "Seeding"
-  dictSet "ganja_seeding" "description" "Seed the ganja plants"
+  task_setup "ganja_seeding" "Seeding" "Seed the ganja plants"
 }
 
 function ganja_seeding_run() {
   log_info "Seeding some plants..."
-  
-  dictSet "ganja_seeding" "status" ${T_STATUS_DONE}
+  task_done! "ganja_seeding"
   return ${E_SUCCESS}
 }
