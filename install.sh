@@ -3,6 +3,15 @@
 # Set to 1 to allow only the root user to execute the script.
 ROOT_ONLY=0
 
+# Path to install script, no matter from where it is called.
+INSTALLER_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+# Path to installer utils.
+UTILS_DIR=${INSTALLER_PATH}/utils
+
+# Path to installer tasks.
+TASKS_DIR=${INSTALLER_PATH}/tasks
+
 ############################## Initial checks #################################
 
 # bash => 3.
@@ -45,9 +54,8 @@ function installation_incomplete() {
 # Automatic installation.
 function run_installation() {
   tasks_each "run_installation_task"
-
-  all_tasks_done?
-  if [ $? -eq ${TRUE} ]; then
+  
+  if all_tasks_done?; then
     installation_complete
     return ${E_SUCCESS}
   else
@@ -82,7 +90,6 @@ function run_installation_task() {
 welcome
 
 # Load our utility modules.
-UTILS_DIR="utils"
 for util in `ls -1 ${UTILS_DIR}`
 do
   source ${UTILS_DIR}/${util}
@@ -95,7 +102,7 @@ log_init
 log_info "Loading tasks..."
 for task in `ls -1 ${TASKS_DIR}`
 do
-  load_task ${task}
+  task_load ${task}
 done
 
 # Read command line arguments.
@@ -109,10 +116,10 @@ then
 else
 
   # Print the status.
-  task_status
+  tasks_status
 
   # Give the user a nice looping main menu!
-  options=("Continue the installation")
+  options=("Run the installation")
   for task in ${TASKS[@]}
   do
     shortname=$(dictGet ${task} "shortname")
@@ -124,17 +131,17 @@ else
   printf "\nWhat would you like to do today:\n"
   select opt in "${options[@]}"
   do
-    if [ "${opt}" =  "Continue the installation" ]; then
+    if [ "${opt}" =  "Run the installation" ]; then
       run_installation
-      task_status
+      tasks_status
     elif [ "${opt}" = "Exit (Ctrl+D)" ]; then
       exit ${E_SUCCESS}
     else
       for task in ${TASKS[@]}
       do
-        if [ "${opt}" = $(dictGet ${task} "shortname") ]; then
+        if [ "${opt}" = "$(dictGet ${task} "shortname")" ]; then
           run_task ${task}
-          task_status
+          tasks_status
         fi
       done
     fi

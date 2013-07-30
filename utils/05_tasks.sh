@@ -4,7 +4,6 @@
 
 ############################## Some globals ###################################
 
-TASKS_DIR="tasks"
 TASKS=()
 
 ############################## Some constants #################################
@@ -37,7 +36,7 @@ function status_msg() {
 }
 
 # Loads the tasks from their files.
-function load_task() {
+function task_load() {
   assert_eq $# 1
 
   local taskname=$(echo ${task} | sed 's/^[0-9]*\_//' | sed 's/\.sh//')
@@ -53,24 +52,24 @@ function load_task() {
   TASKS+=(${taskname})
 }
 
-# Prints the task status screen.
-function task_status() {
-  assert_eq $# 0
+# Setup a task, create variables.
+# Example:
+# task_setup "name" "shortname" "description"
+# task_setup "name" "shortname" "description" "dependencies"
+function task_setup() {
+  assert "$# -ge 3"
+  assert "$# -le 4"
 
-  pad=$(printf '%0.1s' "."{1..80})
-  padlength=60
-  printf "STATUS:\n"
-  printf '%0.1s' "="{1..60}
-  printf '\n'
-  for task in ${TASKS[@]}
-  do
-    local description=$(dictGet ${task} "description")
-    local statuscode=$(dictGet ${task} "status")
-    local status=" ["$(status_msg ${statuscode})"]"
-    printf '%s ' "${description}"
-    printf '%*.*s' 0 $((${padlength} - ${#description} - 1 - ${#status})) "${pad}"
-    printf '%s\n' "${status}"
-  done
+  local task=$1 shortname=$2 description=$3
+  dictSet ${task} "shortname" "${shortname}"
+  dictSet ${task} "description" "${description}"
+
+  if [ $# -eq 4 ]; then
+    local dependencies=$4
+    dictSet ${task} "dependencies" "${dependencies}"
+  fi
+
+  dictSet ${task} "status" ${T_STATUS_NOT_RUN}
 }
 
 # Iterator function for tasks. 
@@ -115,8 +114,7 @@ function all_dependencies_done?() {
   local master=$1
 
   # Does the task specify any dependencies?
-  dictIsSet? ${master} "dependencies"
-  if [ $? -eq ${FALSE} ]; then
+  if ! dictIsSet? ${master} "dependencies"; then
     return ${TRUE}
   fi
 
@@ -130,6 +128,48 @@ function all_dependencies_done?() {
   return ${TRUE}
 }
 
+# Retrieve the status of a task a human-readable text.
+function task_status_msg() {
+  assert_eq $# 1
+  local task=$1
+  local status=$(dictGet ${task} "status")
+  status_msg ${status}
+}
+
+# Set task status to done.
+function task_done!() {
+  assert_eq $# 1
+  local task=$1
+  dictSet ${task} "status" ${T_STATUS_DONE}
+}
+
+# Set task status to failure.
+function task_failed!() {
+  assert_eq $# 1
+  local task=$1
+  dictSet ${task} "status" ${T_STATUS_FAILED}
+}
+
+# Prints the task status screen.
+function tasks_status() {
+  assert_eq $# 0
+
+  local pad=$(printf '%0.1s' "."{1..80})
+  local padlength=60
+  
+  printf "STATUS:\n"
+  printf '%0.1s' "="{1..60}
+  printf '\n'
+  for task in ${TASKS[@]}
+  do
+    local description=$(dictGet ${task} "description")
+    local status=" ["$(task_status_msg ${task})"]"
+    printf '%s ' "${description}"
+    printf '%*.*s' 0 $((${padlength} - ${#description} - 1 - ${#status})) "${pad}"
+    printf '%s\n' "${status}"
+  done
+}
+
 # Runs a tasks and saves the results.
 function run_task() {
   assert_eq $# 1
@@ -137,11 +177,10 @@ function run_task() {
   local shortname=$(dictGet ${task} "shortname")
 
   # Check whether the dependencies are met.
-  all_dependencies_done? ${task}
-  if [ $? -eq ${FALSE} ]; then
+  if ! all_dependencies_done? ${task}; then
     # Ask the user whether he really would like to continue.
     ask "Task ${shortname} has unsatisfied dependencies. Would you really like to run it?"
-    if [ $? -eq ${FALSE} ]; then
+    if [ $? -eq ${NO} ]; then
       return ${E_FAILURE}
     fi    
   fi
@@ -150,15 +189,17 @@ function run_task() {
   ${task}_run
   local result=$?
 
+  # Update the status.
+  if [ ${result} -ne ${E_SUCCESS} ]; then
+    task_failed! ${task}
+  else
+    task_done! ${task}
+  fi
+
   # Save the status.
   dictToFile ${task}
 
   # At least some output.
-  if [ ${result} -ne ${E_SUCCESS} ]; then
-    echo $(dictGet ${task} "shortname")" FAILED (see "$(dictGet "log" "file")")"
-    return ${E_FAILURE}
-  else
-    echo $(dictGet ${task} "shortname")" DONE"
-    return ${E_SUCCESS}
-  fi
+  echo $(dictGet ${task} "shortname")": "$(task_status_msg ${task})
+  return ${result}
 }
