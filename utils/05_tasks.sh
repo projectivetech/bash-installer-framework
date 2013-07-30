@@ -154,8 +154,9 @@ function task_failed!() {
 function tasks_status() {
   assert_eq $# 0
 
-  pad=$(printf '%0.1s' "."{1..80})
-  padlength=60
+  local pad=$(printf '%0.1s' "."{1..80})
+  local padlength=60
+  
   printf "STATUS:\n"
   printf '%0.1s' "="{1..60}
   printf '\n'
