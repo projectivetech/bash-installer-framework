@@ -3,6 +3,15 @@
 # Set to 1 to allow only the root user to execute the script.
 ROOT_ONLY=0
 
+# Path to install script, no matter from where it is called.
+INSTALLER_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+# Path to installer utils.
+UTILS_DIR=${INSTALLER_PATH}/utils
+
+# Path to installer tasks.
+TASKS_DIR=${INSTALLER_PATH}/tasks
+
 ############################## Initial checks #################################
 
 # bash => 3.
@@ -81,7 +90,6 @@ function run_installation_task() {
 welcome
 
 # Load our utility modules.
-UTILS_DIR="utils"
 for util in `ls -1 ${UTILS_DIR}`
 do
   source ${UTILS_DIR}/${util}
