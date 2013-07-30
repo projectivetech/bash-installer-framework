@@ -34,3 +34,21 @@ function ask() {
   # Ctrl-D pressed.
   return ${default}
 }
+
+function enter_variable() {
+  assert_eq $# 1
+  local message=$1
+  local var=""
+
+  read -p "${message}" var
+  echo ${var}
+}
+
+function enter_variable_hidden() {
+  assert_eq $# 1
+  local message=$1
+  local var=""
+
+  read -s -p "${message}" var
+  echo ${var}
+}
