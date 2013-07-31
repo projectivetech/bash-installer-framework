@@ -17,6 +17,9 @@ TASKS_DIR=${INSTALLER_PATH}/tasks
 # User configuration file.
 USER_CONFIG=${INSTALLER_PATH}/config.sh
 
+# Array of log severity values that go both to stdout and the logfile.
+LOG_STDOUT=( "IMPORTANT" "ERROR" )
+
 ############################## User configuration #############################
 
 if [ -f ${USER_CONFIG} ]; then
