@@ -111,6 +111,55 @@ function run_installation_task() {
   fi
 }
 
+function main_menu() {
+  # Print the status.
+  tasks_status
+
+  # Give the user a nice looping main menu!
+  local options=( "Run the installation" "Run single task" "Exit (Ctrl+D)")
+
+  printf "\nWhat would you like to do today:\n"
+  select opt in "${options[@]}"; do
+    if [ "${opt}" =  "Run the installation" ]; then
+      run_installation
+      tasks_status
+    elif [ "${opt}" = "Run single task" ]; then
+      single_task_menu
+      tasks_status
+    elif [ "${opt}" = "Exit (Ctrl+D)" ]; then
+      exit ${E_SUCCESS}
+    fi
+  done
+}
+
+function single_task_menu() {
+  # Give the user a nice looping single task menu!
+  local options=()
+  for task in ${TASKS[@]}
+  do
+    shortname=$(dictGet ${task} "shortname")
+    options+=("${shortname}")
+  done
+  options+=("Nevermind (Ctrl+D)")
+
+  printf "\nWhich one?\n"
+  select opt in "${options[@]}"; do
+    if [ "${opt}" == "Nevermind (Ctrl+D)" ]; then
+      return ${E_SUCCESS}
+    else
+      for task in ${TASKS[@]}
+      do
+        if [ "${opt}" = "$(dictGet ${task} "shortname")" ]; then
+          run_task ${task}
+          return $?
+        fi
+      done
+    fi
+  done
+
+  return ${E_SUCCESS}
+}
+
 ############################## Main app #######################################
 
 # Print the welcome message.
@@ -138,40 +187,13 @@ if [ $# -ge 1 ]
 then
   
   # TODO: Fully Automatic installation.
-  echo "TODO"
+  echo "Fully automatic installation not yet implemented."
 
 else
 
-  # Print the status.
-  tasks_status
-
-  # Give the user a nice looping main menu!
-  options=("Run the installation")
-  for task in ${TASKS[@]}
-  do
-    shortname=$(dictGet ${task} "shortname")
-    options+=("${shortname}")
-  done
-  options+=("Exit (Ctrl+D)")
-
-  # Main menu loop.
-  printf "\nWhat would you like to do today:\n"
-  select opt in "${options[@]}"
-  do
-    if [ "${opt}" =  "Run the installation" ]; then
-      run_installation
-      tasks_status
-    elif [ "${opt}" = "Exit (Ctrl+D)" ]; then
-      exit ${E_SUCCESS}
-    else
-      for task in ${TASKS[@]}
-      do
-        if [ "${opt}" = "$(dictGet ${task} "shortname")" ]; then
-          run_task ${task}
-          tasks_status
-        fi
-      done
-    fi
-  done
+  # User-driven installation.
+  main_menu
 
 fi
+
+exit 0
