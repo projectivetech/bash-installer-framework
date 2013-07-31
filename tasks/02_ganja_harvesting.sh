@@ -8,7 +8,7 @@ function ganja_harvesting_run() {
   log_info "Cutting the plants..."
 
   if [ -f "scissors" ]; then
-    touch "two.joints.in.the.morning"
+    echo "bigbuds" >> ./ganja_crop
     return ${E_SUCCESS}
   else
     log_error "Missing scissors. Please touch the scissors."

@@ -6,6 +6,11 @@
 #
 # log_error "An error happened."
 # log_warning "Unsupported OS" $OS
+#
+# Use log_command for all non-quiet commands,
+# e.g.:
+# log_command apt-get install gcc
+
 
 function _color_code() {
   assert_eq $# 1
@@ -107,7 +112,7 @@ function log_info() {
   _log "INFO" "$@"
 }
 
-# Only used to display task results.
+# Used to display task results.
 function log_task_start() {
   assert_eq $# 1
   local task=$1
@@ -124,5 +129,16 @@ function log_task_finish() {
   local msg=$(dictGet ${task} "shortname")" ~> "$(task_status_msg ${task})
 
   _log "FINISH" "${msg}"
+}
+
+function log_command() {
+  assert "$# -ge 0"
+  local logfile=$(dictGet "log" "file")
+
+  (
+    eval "$@"
+  ) >> ${logfile}
+
+  return $?
 }
 
