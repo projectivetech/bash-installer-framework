@@ -1,16 +1,27 @@
-############################## Global configuration ###########################
-
-# Set to 1 to allow only the root user to execute the script.
-ROOT_ONLY=0
+############################## Global constants ###############################
 
 # Path to install script, no matter from where it is called.
 INSTALLER_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+############################## Default configuration ##########################
+
+# Set to 1 to allow only the root user to execute the script.
+ROOT_ONLY=0
 
 # Path to installer utils.
 UTILS_DIR=${INSTALLER_PATH}/utils
 
 # Path to installer tasks.
 TASKS_DIR=${INSTALLER_PATH}/tasks
+
+# User configuration file.
+USER_CONFIG=${INSTALLER_PATH}/config.sh
+
+############################## User configuration #############################
+
+if [ -f ${USER_CONFIG} ]; then
+  source ${USER_CONFIG}
+fi
 
 ############################## Initial checks #################################
 
@@ -39,16 +50,29 @@ date --version >/dev/null 2>&1 || { echo "Please install 'date'"; exit 1; }
 
 ############################## Some functions #################################
 
-function welcome() {
-  echo "Welcome."
+function call_welcome() {
+
+  if [ "$(type -t welcome)" == "function" ]; then
+    welcome
+  else
+    echo "Welcome."
+  fi
 }
 
-function installation_complete() {
-  echo "Installation complete."
+function call_installation_complete() {
+  if [ "$(type -t installation_complete)" == "function" ]; then
+    installation_complete
+  else
+    echo "Installation complete."
+  fi
 }
 
-function installation_incomplete() {
-  echo "Installation incomplete."
+function call_installation_incomplete() {
+  if [ "$(type -t installation_incomplete)" == "function" ]; then
+    installation_incomplete
+  else
+    echo "Installation incomplete."
+  fi
 }
 
 # Automatic installation.
@@ -56,10 +80,10 @@ function run_installation() {
   tasks_each "run_installation_task"
   
   if all_tasks_done?; then
-    installation_complete
+    call_installation_complete
     return ${E_SUCCESS}
   else
-    installation_incomplete
+    call_installation_incomplete
     return ${E_FAILURE}
   fi
 }
@@ -87,7 +111,7 @@ function run_installation_task() {
 ############################## Main app #######################################
 
 # Print the welcome message.
-welcome
+call_welcome
 
 # Load our utility modules.
 for util in `ls -1 ${UTILS_DIR}`
