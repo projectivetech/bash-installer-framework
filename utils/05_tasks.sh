@@ -185,6 +185,9 @@ function run_task() {
     fi    
   fi
 
+  # Log the task run.
+  log_task_start ${task}
+
   # Run the task.
   ${task}_run
   local result=$?
@@ -196,10 +199,11 @@ function run_task() {
     task_done! ${task}
   fi
 
+  # Log the result.
+  log_task_finish ${task}
+
   # Save the status.
   dictToFile ${task}
 
-  # At least some output.
-  echo $(dictGet ${task} "shortname")": "$(task_status_msg ${task})
   return ${result}
 }

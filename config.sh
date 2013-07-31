@@ -14,7 +14,7 @@
 #TASKS_DIR=${INSTALLER_PATH}/data/tasks
 
 # Overwrite default log-to-stdout config.
-#LOG_STDOUT=( "IMPORTANT" "ERROR" "INFO" "WARNING" )
+#LOG_STDOUT=( "IMPORTANT" "ERROR" "IMPORTANT" "ERROR" "START" "FINISH")
 
 function welcome() {
   echo -e "\e[00;32mWelcome to the new and shiny installer framework!\e[00m"

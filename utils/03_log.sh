@@ -24,6 +24,12 @@ function _color_code() {
     "WARNING")
       color="\e[01;33m"
       ;;
+    "START")
+      color="\e[00;35m"
+      ;;
+    "FINISH")
+      color="\e[00;35m"
+      ;;
   esac
 
   echo "${color}"
@@ -100,3 +106,23 @@ function log_info() {
   assert "$# -ge 1"
   _log "INFO" "$@"
 }
+
+# Only used to display task results.
+function log_task_start() {
+  assert_eq $# 1
+  local task=$1
+  local shortname=$(dictGet ${task} "shortname")
+
+  _log "START" "${shortname}"
+}
+
+function log_task_finish() {
+  assert_eq $# 1
+  local task=$1
+
+  # Get the result.
+  local msg=$(dictGet ${task} "shortname")" ~> "$(task_status_msg ${task})
+
+  _log "FINISH" "${msg}"
+}
+
