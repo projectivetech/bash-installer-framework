@@ -1,16 +1,30 @@
-############################## Global configuration ###########################
-
-# Set to 1 to allow only the root user to execute the script.
-ROOT_ONLY=0
+############################## Global constants ###############################
 
 # Path to install script, no matter from where it is called.
 INSTALLER_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+############################## Default configuration ##########################
+
+# Set to 1 to allow only the root user to execute the script.
+ROOT_ONLY=0
 
 # Path to installer utils.
 UTILS_DIR=${INSTALLER_PATH}/utils
 
 # Path to installer tasks.
 TASKS_DIR=${INSTALLER_PATH}/tasks
+
+# User configuration file.
+USER_CONFIG=${INSTALLER_PATH}/config.sh
+
+# Array of log severity values that go both to stdout and the logfile.
+LOG_STDOUT=( "ERROR" "IMPORTANT" "WARNING" "START" "FINISH" )
+
+############################## User configuration #############################
+
+if [ -f ${USER_CONFIG} ]; then
+  source ${USER_CONFIG}
+fi
 
 ############################## Initial checks #################################
 
@@ -39,16 +53,29 @@ date --version >/dev/null 2>&1 || { echo "Please install 'date'"; exit 1; }
 
 ############################## Some functions #################################
 
-function welcome() {
-  echo "Welcome."
+function call_welcome() {
+
+  if [ "$(type -t welcome)" == "function" ]; then
+    welcome
+  else
+    echo "Welcome."
+  fi
 }
 
-function installation_complete() {
-  echo "Installation complete."
+function call_installation_complete() {
+  if [ "$(type -t installation_complete)" == "function" ]; then
+    installation_complete
+  else
+    echo "Installation complete."
+  fi
 }
 
-function installation_incomplete() {
-  echo "Installation incomplete."
+function call_installation_incomplete() {
+  if [ "$(type -t installation_incomplete)" == "function" ]; then
+    installation_incomplete
+  else
+    echo "Installation incomplete."
+  fi
 }
 
 # Automatic installation.
@@ -56,10 +83,10 @@ function run_installation() {
   tasks_each "run_installation_task"
   
   if all_tasks_done?; then
-    installation_complete
+    call_installation_complete
     return ${E_SUCCESS}
   else
-    installation_incomplete
+    call_installation_incomplete
     return ${E_FAILURE}
   fi
 }
@@ -84,10 +111,59 @@ function run_installation_task() {
   fi
 }
 
+function main_menu() {
+  # Print the status.
+  tasks_status
+
+  # Give the user a nice looping main menu!
+  local options=( "Run the installation" "Run single task" "Exit (Ctrl+D)")
+
+  printf "\nWhat would you like to do today:\n"
+  select opt in "${options[@]}"; do
+    if [ "${opt}" =  "Run the installation" ]; then
+      run_installation
+      tasks_status
+    elif [ "${opt}" = "Run single task" ]; then
+      single_task_menu
+      tasks_status
+    elif [ "${opt}" = "Exit (Ctrl+D)" ]; then
+      exit ${E_SUCCESS}
+    fi
+  done
+}
+
+function single_task_menu() {
+  # Give the user a nice looping single task menu!
+  local options=()
+  for task in ${TASKS[@]}
+  do
+    shortname=$(dictGet ${task} "shortname")
+    options+=("${shortname}")
+  done
+  options+=("Nevermind (Ctrl+D)")
+
+  printf "\nWhich one?\n"
+  select opt in "${options[@]}"; do
+    if [ "${opt}" == "Nevermind (Ctrl+D)" ]; then
+      return ${E_SUCCESS}
+    else
+      for task in ${TASKS[@]}
+      do
+        if [ "${opt}" = "$(dictGet ${task} "shortname")" ]; then
+          run_task ${task}
+          return $?
+        fi
+      done
+    fi
+  done
+
+  return ${E_SUCCESS}
+}
+
 ############################## Main app #######################################
 
 # Print the welcome message.
-welcome
+call_welcome
 
 # Load our utility modules.
 for util in `ls -1 ${UTILS_DIR}`
@@ -111,40 +187,13 @@ if [ $# -ge 1 ]
 then
   
   # TODO: Fully Automatic installation.
-  echo "TODO"
+  echo "Fully automatic installation not yet implemented."
 
 else
 
-  # Print the status.
-  tasks_status
-
-  # Give the user a nice looping main menu!
-  options=("Run the installation")
-  for task in ${TASKS[@]}
-  do
-    shortname=$(dictGet ${task} "shortname")
-    options+=("${shortname}")
-  done
-  options+=("Exit (Ctrl+D)")
-
-  # Main menu loop.
-  printf "\nWhat would you like to do today:\n"
-  select opt in "${options[@]}"
-  do
-    if [ "${opt}" =  "Run the installation" ]; then
-      run_installation
-      tasks_status
-    elif [ "${opt}" = "Exit (Ctrl+D)" ]; then
-      exit ${E_SUCCESS}
-    else
-      for task in ${TASKS[@]}
-      do
-        if [ "${opt}" = "$(dictGet ${task} "shortname")" ]; then
-          run_task ${task}
-          tasks_status
-        fi
-      done
-    fi
-  done
+  # User-driven installation.
+  main_menu
 
 fi
+
+exit 0

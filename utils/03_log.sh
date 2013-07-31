@@ -6,6 +6,52 @@
 #
 # log_error "An error happened."
 # log_warning "Unsupported OS" $OS
+#
+# Use log_command for all non-quiet commands,
+# e.g.:
+# log_command apt-get install gcc
+
+
+function _color_code() {
+  assert_eq $# 1
+  local severity=$1 color="\e[00m"
+
+  case ${severity} in
+    "IMPORTANT")
+      color="\e[00;32m"
+      ;;
+    "ERROR")
+      color="\e[00;31m"
+      ;;
+    "INFO")
+      color="\e[00;35m"
+      ;;
+    "WARNING")
+      color="\e[01;33m"
+      ;;
+    "START")
+      color="\e[00;35m"
+      ;;
+    "FINISH")
+      color="\e[00;35m"
+      ;;
+  esac
+
+  echo "${color}"
+}
+
+function _log_to_stdout?() {
+  assert_eq $# 1
+  local severity=$1
+  
+  for s in "${LOG_STDOUT[@]}"; do
+    if [ ${s} == ${severity} ]; then
+      return ${TRUE}
+    fi
+  done
+
+  return ${FALSE}
+}
 
 function _log() {
   assert "$# -ge 2"
@@ -17,11 +63,11 @@ function _log() {
   local padlength=9
   local severity_str=${severity}$(printf '%*.*s' 0 $((${padlength} - ${#severity})) "${pad}")
 
-  # Important messages and errors go to stdout as well.
-  if [ ${severity} == "IMPORTANT" ]; then
-    echo -e "\e[00;32m${severity}: ${msg}\e[00m"
-  elif [ ${severity} == "ERROR" ]; then
-    echo -e "\e[00;31m${severity}: ${msg}\e[00m"
+  # Check if we should also log to stdout.
+  if _log_to_stdout? ${severity}; then
+    local uncolor="\e[0;00m"
+    local color=$(_color_code ${severity})
+    echo -e "${color}${severity}: ${msg}${uncolor}"
   fi
 
   # Print to logfile.
@@ -65,3 +111,34 @@ function log_info() {
   assert "$# -ge 1"
   _log "INFO" "$@"
 }
+
+# Used to display task results.
+function log_task_start() {
+  assert_eq $# 1
+  local task=$1
+  local shortname=$(dictGet ${task} "shortname")
+
+  _log "START" "${shortname}"
+}
+
+function log_task_finish() {
+  assert_eq $# 1
+  local task=$1
+
+  # Get the result.
+  local msg=$(dictGet ${task} "shortname")" ~> "$(task_status_msg ${task})
+
+  _log "FINISH" "${msg}"
+}
+
+function log_command() {
+  assert "$# -ge 0"
+  local logfile=$(dictGet "log" "file")
+
+  (
+    eval "$@"
+  ) >> ${logfile}
+
+  return $?
+}
+
