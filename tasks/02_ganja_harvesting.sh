@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 function ganja_harvesting_init() {
-  task_setup "ganja_harvesting" "Harvesting" "Harbest the ganja plants" "ganja_seeding ganja_farming"
+  task_setup "ganja_harvesting" "Harvesting" "Harvest the ganja plants" "ganja_seeding ganja_farming"
 }
 
 function ganja_harvesting_run() {
