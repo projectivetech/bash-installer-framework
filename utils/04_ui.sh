@@ -50,5 +50,6 @@ function enter_variable_hidden() {
   local var=""
 
   read -s -p "${message}" var
+  echo >&2 # Print the newline to stdout explicitly, since read -s gobbles it away.
   echo ${var}
 }
