@@ -12,29 +12,33 @@ Installer tasks should reside in the `tasks` subdirectory and should be prefixed
 
 Each task needs to define two functions, `<taskname>_init` and `<taskname>_run`, where `<taskname>` is everything between the two-digit prefix and the `.sh` file extension (e.g., `check_system`). The `init` needs to register the task with the installer framework by calling the `task_setup` function:
 
-    task_setup <taskname> <shortname> <description> [dependencies]
+```bash
+task_setup <taskname> <shortname> <description> [dependencies]
+```
 
 The `run` method should do the hard work and should return `${E_SUCCESS}` on success, `${E_FAILURE}` otherwise. If the task needs to save additional data persistently, it can do so by storing it in its own dictionary by calling `dictSet <taskname> <key> <value>`. For convenience, tasks may define getter functions for their data (see `tasks/03_ganja_smoking.sh` and `tasks/04_his_highness.sh` for example).
 
 Here's a simple example of a task:
 
-    # File: 01_install_packages.sh
+```bash
+# File: 01_install_packages.sh
 
-    function install_packages_init() {
-      task_setup "install_packages" "Install packages" "Install system packages" "check_system"
-    }
+function install_packages_init() {
+  task_setup "install_packages" "Install packages" "Install system packages" "check_system"
+}
 
-    function install_packages_run() {
-      log_info "Installing packages..."
-      
-      log_command apt-get install gcc
-      if [ $? -ne 0 ]; then
-        log_error "Failed to install packages."
-        return ${E_FAILURE}
-      fi
+function install_packages_run() {
+  log_info "Installing packages..."
+  
+  log_command apt-get install gcc
+  if [ $? -ne 0 ]; then
+    log_error "Failed to install packages."
+    return ${E_FAILURE}
+  fi
 
-      return ${E_SUCCESS}
-    }
+  return ${E_SUCCESS}
+}
+```
 
 ## Utilities
 
@@ -50,17 +54,19 @@ By default, most of the logging output is printed to `STDOUT` as well, this may 
 
 Three simple UI functions exist to help the user retrieve information from the customer. Examples:
 
-    if ask "Are you sure?"; then
-      ...
-    fi
+```bash
+if ask "Are you sure?"; then
+  ...
+fi
 
-    username=$(enter_variable "Please enter your username: ")
-    if [ -z ${username} ]; then
-      # The user didn't enter anything! Error out.
-    fi
+username=$(enter_variable "Please enter your username: ")
+if [ -z ${username} ]; then
+  # The user didn't enter anything! Error out.
+fi
 
-    password=$(enter_hidden_variable "Please enter a password: ")
-    ...
+password=$(enter_hidden_variable "Please enter a password: ")
+...
+```
 
 # License
 
