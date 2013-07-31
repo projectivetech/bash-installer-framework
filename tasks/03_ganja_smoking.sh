@@ -17,9 +17,16 @@ function ganja_smoking_run() {
       return ${E_FAILURE}
     fi
 
+    # Let's save some data.
+    dictSet "ganja_smoking" "smoked" "two joints"
+
     return ${E_SUCCESS}
   else
     log_error "Seems you failed to cut the plants... What should I smoke?"
     return ${E_FAILURE}
   fi
+}
+
+function whatdidismoke() {
+  echo $(dictGet "ganja_smoking" "smoked")
 }

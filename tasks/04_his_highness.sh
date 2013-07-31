@@ -13,7 +13,9 @@ function his_highness_run() {
     return ${E_FAILURE}
   fi
 
-  log_important "You are really baked now. This line goes to both stdout and the logfile."
+  # Let's retrieve some data from another task.
+  local smoked=$(whatdidismoke)
+  log_important "After you smoked ${smoked} you are really baked now."
 
   return ${E_SUCCESS}
 }
