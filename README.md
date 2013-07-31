@@ -1,6 +1,6 @@
-# Installer Framework
+# Bash Installer Framework
 
-This is our new menu-based generic installer framework. See the `tasks` directory for installation task examples, see files in `utils` to get an idea of what you can do wrt. logging, `UI` things, and the like.
+... is a simple bash-based installation framework for your daily tedious installation tasks.
 
 ## Getting started
 
@@ -62,4 +62,6 @@ Three simple UI functions exist to help the user retrieve information from the c
     password=$(enter_hidden_variable "Please enter a password: ")
     ...
 
+# License
 
+The installer framework is licensed under the MIT license. See `LICENSE` file for details.
