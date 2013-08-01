@@ -53,40 +53,15 @@ date --version >/dev/null 2>&1 || { echo "Please install 'date'"; exit 1; }
 
 ############################## Some functions #################################
 
-function call_welcome() {
-
-  if [ "$(type -t welcome)" == "function" ]; then
-    welcome
-  else
-    echo "Welcome."
-  fi
-}
-
-function call_installation_complete() {
-  if [ "$(type -t installation_complete)" == "function" ]; then
-    installation_complete
-  else
-    echo "Installation complete."
-  fi
-}
-
-function call_installation_incomplete() {
-  if [ "$(type -t installation_incomplete)" == "function" ]; then
-    installation_incomplete
-  else
-    echo "Installation incomplete."
-  fi
-}
-
 # Automatic installation.
 function run_installation() {
   tasks_each "run_installation_task"
   
   if all_tasks_done?; then
-    call_installation_complete
+    dispatch_msg "installation_complete"
     return ${E_SUCCESS}
   else
-    call_installation_incomplete
+    dispatch_msg "installation_incomplete"
     return ${E_FAILURE}
   fi
 }
@@ -112,13 +87,16 @@ function run_installation_task() {
 }
 
 function main_menu() {
+  # Print the welcome message.
+  dispatch_msg "welcome"
+
   # Print the status.
   tasks_status
 
   # Give the user a nice looping main menu!
   local options=( "Run the installation" "Run single task" "Exit (Ctrl+D)")
 
-  printf "\nWhat would you like to do today:\n"
+  echo -e "\n$(dispatch_msg "main_menu_prompt")"
   select opt in "${options[@]}"; do
     if [ "${opt}" =  "Run the installation" ]; then
       run_installation
@@ -142,7 +120,7 @@ function single_task_menu() {
   done
   options+=("Nevermind (Ctrl+D)")
 
-  printf "\nWhich one?\n"
+  echo -e "\n$(dispatch_msg "task_menu_prompt")"
   select opt in "${options[@]}"; do
     if [ "${opt}" == "Nevermind (Ctrl+D)" ]; then
       return ${E_SUCCESS}
@@ -162,12 +140,8 @@ function single_task_menu() {
 
 ############################## Main app #######################################
 
-# Print the welcome message.
-call_welcome
-
 # Load our utility modules.
-for util in `ls -1 ${UTILS_DIR}`
-do
+for util in `ls -1 ${UTILS_DIR}`; do
   source ${UTILS_DIR}/${util}
 done
 
@@ -183,8 +157,7 @@ done
 
 # Read command line arguments.
 log_info "Reading command line arguments..."
-if [ $# -ge 1 ]
-then
+if [ $# -ge 1 ]; then
   
   # TODO: Fully Automatic installation.
   echo "Fully automatic installation not yet implemented."

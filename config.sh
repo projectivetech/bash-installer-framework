@@ -30,3 +30,11 @@ function installation_complete() {
 function installation_incomplete() {
   echo -e "\e[00;31mWhoopsie!\e[00m"
 }
+
+#function main_menu_prompt() {
+#  echo "What ye want?"
+#}
+
+#function task_menu_prompt() {
+#  echo "TAAASK?"
+#}
