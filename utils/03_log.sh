@@ -126,7 +126,7 @@ function log_task_finish() {
   local task=$1
 
   # Get the result.
-  local msg=$(dictGet ${task} "shortname")" ~> "$(task_status_msg ${task})
+  local msg=$(dictGet ${task} "shortname")" -> "$(task_status_msg ${task})
 
   _log "FINISH" "${msg}"
 }
