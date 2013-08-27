@@ -35,6 +35,9 @@ function _color_code() {
     "FINISH")
       color="\e[00;35m"
       ;;
+    "SKIP")
+      color="\e[01;33m"
+      ;;
   esac
 
   echo "${color}"
@@ -110,6 +113,15 @@ function log_warning() {
 function log_info() {
   assert "$# -ge 1"
   _log "INFO" "$@"
+}
+
+# Used to note a task has been skipped.
+function log_task_skip() {
+  assert_eq $# 1
+  local task=$1
+  local shortname=$(dictGet ${task} "shortname")
+
+  _log "SKIP" "${shortname}"
 }
 
 # Used to display task results.

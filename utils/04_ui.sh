@@ -83,6 +83,9 @@ function dispatch_msg() {
       "task_menu_prompt")
         echo "Which one?"
         ;;
+      "skip_menu_prompt")
+        echo "Which task should be marked to be skipped/unskipped?"
+        ;;
     esac
   fi
 }

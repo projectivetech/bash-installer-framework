@@ -38,3 +38,7 @@ function installation_incomplete() {
 #function task_menu_prompt() {
 #  echo "TAAASK?"
 #}
+
+#function skip_menu_prompt() {
+#  echo "SKIPP?"
+#}

@@ -103,24 +103,30 @@ function main_menu() {
   tasks_status
 
   # Give the user a nice looping main menu!
-  local options=( "Run the installation" "Run single task" "Exit (Ctrl+D)")
+  local options=( "Run the installation" "Skip/Unskip task" "Run single task" "Exit (Ctrl+D)")
 
   echo -e "\n$(dispatch_msg "main_menu_prompt")"
   select opt in "${options[@]}"; do
-    if [ "${opt}" =  "Run the installation" ]; then
+    if [ "${opt}" == "Run the installation" ]; then
       run_installation
       tasks_status
-    elif [ "${opt}" = "Run single task" ]; then
+    elif [ "${opt}" == "Skip/Unskip task" ]; then
+      skip_task_menu
+      tasks_status
+    elif [ "${opt}" == "Run single task" ]; then
       single_task_menu
       tasks_status
-    elif [ "${opt}" = "Exit (Ctrl+D)" ]; then
+    elif [ "${opt}" == "Exit (Ctrl+D)" ]; then
       exit ${E_SUCCESS}
     fi
   done
 }
 
-function single_task_menu() {
-  # Give the user a nice looping single task menu!
+function _select_task_menu() {
+  assert_eq $# 2
+  assert_function $1
+  local func=$1 prompt=$2
+
   local options=()
   for task in ${TASKS[@]}
   do
@@ -129,7 +135,7 @@ function single_task_menu() {
   done
   options+=("Nevermind (Ctrl+D)")
 
-  echo -e "\n$(dispatch_msg "task_menu_prompt")"
+  echo -e "\n$(dispatch_msg ${prompt})"
   select opt in "${options[@]}"; do
     if [ "${opt}" == "Nevermind (Ctrl+D)" ]; then
       return ${E_SUCCESS}
@@ -137,14 +143,24 @@ function single_task_menu() {
       for task in ${TASKS[@]}
       do
         if [ "${opt}" = "$(dictGet ${task} "shortname")" ]; then
-          run_task ${task}
+          ${func} ${task}
           return $?
         fi
       done
     fi
   done
 
-  return ${E_SUCCESS}
+  return ${E_SUCCESS}  
+}
+
+function skip_task_menu() {
+  _select_task_menu "skip_unskip_task" "skip_menu_prompt"
+  return $?
+}
+
+function single_task_menu() {
+  _select_task_menu "run_task" "task_menu_prompt"
+  return $?
 }
 
 ############################## Main app #######################################
