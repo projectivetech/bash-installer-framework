@@ -35,6 +35,7 @@ function ask() {
   return ${default}
 }
 
+# Let the user enter a variable.
 function enter_variable() {
   assert_eq $# 1
   local message=$1
@@ -44,6 +45,7 @@ function enter_variable() {
   echo ${var}
 }
 
+# Let the user enter a hidden variable (e.g., password).
 function enter_variable_hidden() {
   assert_eq $# 1
   local message=$1
@@ -52,4 +54,38 @@ function enter_variable_hidden() {
   read -s -p "${message}" var
   echo >&2 # Print the newline to stdout explicitly, since read -s gobbles it away.
   echo ${var}
+}
+
+# Used to translate messages to user-defined strings.
+# TODO: We could also use gettext. But maybe, callbacks are more versatile.
+# http://mywiki.wooledge.org/BashFAQ/098
+function dispatch_msg() {
+  assert_eq $# 1
+  local msg=$1
+
+  # Check if the user has defined a callback.
+  if [ "$(type -t ${msg})" == "function" ]; then
+    ${msg}
+  else
+    case ${msg} in
+      "welcome")
+        echo "Welcome!"
+        ;;
+      "installation_complete")
+        echo "Installation complete."
+        ;;
+      "installation_incomplete")
+        echo "Installation incomplete."
+        ;;
+      "main_menu_prompt")
+        echo "What would you like to do today?"
+        ;;
+      "task_menu_prompt")
+        echo "Which one?"
+        ;;
+      "skip_menu_prompt")
+        echo "Which task should be marked to be skipped/unskipped?"
+        ;;
+    esac
+  fi
 }

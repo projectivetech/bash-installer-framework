@@ -1,5 +1,14 @@
 ############################## Global constants ###############################
 
+# TODO: This is bad.
+# First, $SUDO_USER may not be set depending on the sudo version installed on
+# the resp. OS. Second, we should better adapt the failing line 13 to work
+# a different way.
+if [ ! -z ${SUDO_USER} ]; then
+  echo "Please run the script as root, not via sudo."
+  exit 1
+fi
+
 # Path to install script, no matter from where it is called.
 INSTALLER_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
@@ -53,40 +62,15 @@ date --version >/dev/null 2>&1 || { echo "Please install 'date'"; exit 1; }
 
 ############################## Some functions #################################
 
-function call_welcome() {
-
-  if [ "$(type -t welcome)" == "function" ]; then
-    welcome
-  else
-    echo "Welcome."
-  fi
-}
-
-function call_installation_complete() {
-  if [ "$(type -t installation_complete)" == "function" ]; then
-    installation_complete
-  else
-    echo "Installation complete."
-  fi
-}
-
-function call_installation_incomplete() {
-  if [ "$(type -t installation_incomplete)" == "function" ]; then
-    installation_incomplete
-  else
-    echo "Installation incomplete."
-  fi
-}
-
 # Automatic installation.
 function run_installation() {
   tasks_each "run_installation_task"
   
   if all_tasks_done?; then
-    call_installation_complete
+    dispatch_msg "installation_complete"
     return ${E_SUCCESS}
   else
-    call_installation_incomplete
+    dispatch_msg "installation_incomplete"
     return ${E_FAILURE}
   fi
 }
@@ -112,28 +96,37 @@ function run_installation_task() {
 }
 
 function main_menu() {
+  # Print the welcome message.
+  dispatch_msg "welcome"
+
   # Print the status.
   tasks_status
 
   # Give the user a nice looping main menu!
-  local options=( "Run the installation" "Run single task" "Exit (Ctrl+D)")
+  local options=( "Run the installation" "Skip/Unskip task" "Run single task" "Exit (Ctrl+D)")
 
-  printf "\nWhat would you like to do today:\n"
+  echo -e "\n$(dispatch_msg "main_menu_prompt")"
   select opt in "${options[@]}"; do
-    if [ "${opt}" =  "Run the installation" ]; then
+    if [ "${opt}" == "Run the installation" ]; then
       run_installation
       tasks_status
-    elif [ "${opt}" = "Run single task" ]; then
+    elif [ "${opt}" == "Skip/Unskip task" ]; then
+      skip_task_menu
+      tasks_status
+    elif [ "${opt}" == "Run single task" ]; then
       single_task_menu
       tasks_status
-    elif [ "${opt}" = "Exit (Ctrl+D)" ]; then
+    elif [ "${opt}" == "Exit (Ctrl+D)" ]; then
       exit ${E_SUCCESS}
     fi
   done
 }
 
-function single_task_menu() {
-  # Give the user a nice looping single task menu!
+function _select_task_menu() {
+  assert_eq $# 2
+  assert_function $1
+  local func=$1 prompt=$2
+
   local options=()
   for task in ${TASKS[@]}
   do
@@ -142,7 +135,7 @@ function single_task_menu() {
   done
   options+=("Nevermind (Ctrl+D)")
 
-  printf "\nWhich one?\n"
+  echo -e "\n$(dispatch_msg ${prompt})"
   select opt in "${options[@]}"; do
     if [ "${opt}" == "Nevermind (Ctrl+D)" ]; then
       return ${E_SUCCESS}
@@ -150,24 +143,30 @@ function single_task_menu() {
       for task in ${TASKS[@]}
       do
         if [ "${opt}" = "$(dictGet ${task} "shortname")" ]; then
-          run_task ${task}
+          ${func} ${task}
           return $?
         fi
       done
     fi
   done
 
-  return ${E_SUCCESS}
+  return ${E_SUCCESS}  
+}
+
+function skip_task_menu() {
+  _select_task_menu "skip_unskip_task" "skip_menu_prompt"
+  return $?
+}
+
+function single_task_menu() {
+  _select_task_menu "run_task" "task_menu_prompt"
+  return $?
 }
 
 ############################## Main app #######################################
 
-# Print the welcome message.
-call_welcome
-
 # Load our utility modules.
-for util in `ls -1 ${UTILS_DIR}`
-do
+for util in `ls -1 ${UTILS_DIR}`; do
   source ${UTILS_DIR}/${util}
 done
 
@@ -183,8 +182,7 @@ done
 
 # Read command line arguments.
 log_info "Reading command line arguments..."
-if [ $# -ge 1 ]
-then
+if [ $# -ge 1 ]; then
   
   # TODO: Fully Automatic installation.
   echo "Fully automatic installation not yet implemented."

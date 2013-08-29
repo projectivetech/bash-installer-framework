@@ -11,6 +11,7 @@ TASKS=()
 T_STATUS_NOT_RUN=1
 T_STATUS_FAILED=2
 T_STATUS_DONE=3
+T_STATUS_SKIP=4
 
 ############################## Some functions #################################
 
@@ -27,6 +28,9 @@ function status_msg() {
       ;;
     ${T_STATUS_DONE})
       msg="DONE"
+      ;;
+    ${T_STATUS_SKIP})
+      msg="SKIP"
       ;;
     *)
       assert "false"
@@ -90,6 +94,18 @@ function tasks_each() {
   return ${TRUE}
 }
 
+# Returns ${TRUE} if a task has been marked to be skipped, ${FALSE} otherwise.
+function task_skip?() {
+  assert_eq $# 1
+  local task=$1
+
+  if [ $(dictGet ${task} "status") == ${T_STATUS_SKIP} ]; then
+    return ${TRUE}
+  else
+    return ${FALSE}
+  fi
+}
+
 # Returns ${TRUE} if a task has been completed, ${FALSE} otherwise.
 function task_done?() {
   assert_eq $# 1
@@ -136,6 +152,20 @@ function task_status_msg() {
   status_msg ${status}
 }
 
+# Set task status to skip.
+function task_skip!() {
+  assert_eq $# 1
+  local task=$1
+  dictSet ${task} "status" ${T_STATUS_SKIP}
+}
+
+# Set task status to not run.
+function task_not_run!() {
+  assert_eq $# 1
+  local task=$1
+  dictSet ${task} "status" ${T_STATUS_NOT_RUN}
+}
+
 # Set task status to done.
 function task_done!() {
   assert_eq $# 1
@@ -170,11 +200,31 @@ function tasks_status() {
   done
 }
 
+# Marks a task to be skipped.
+function skip_unskip_task() {
+  assert_eq $# 1
+  local task=$1
+
+  if task_skip? ${task}; then
+    task_not_run! ${task}
+  else
+    task_skip! ${task}
+  fi
+  
+  return ${E_SUCCESS}
+}
+
 # Runs a tasks and saves the results.
 function run_task() {
   assert_eq $# 1
-  local task=$1 
+  local task=$1
   local shortname=$(dictGet ${task} "shortname")
+
+  # Check whether task has been marked to be skip.
+  if task_skip? ${task}; then
+    log_task_skip ${task}
+    return ${E_SUCCESS}
+  fi
 
   # Check whether the dependencies are met.
   if ! all_dependencies_done? ${task}; then
