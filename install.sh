@@ -180,12 +180,21 @@ do
   task_load ${task}
 done
 
+# Add autorun command line option.
+add_command_line_switch "run" "run" "r" "Run the installation automatically"
+
 # Read command line arguments.
 log_info "Reading command line arguments..."
-if [ $# -ge 1 ]; then
-  
-  # TODO: Fully Automatic installation.
-  echo "Fully automatic installation not yet implemented."
+process_command_line_options "$@"
+if [ $? -ne ${E_SUCCESS} ]; then
+  usage
+  exit ${E_FAILURE}
+fi
+
+if has_command_line_switch? "run"; then
+
+  # Automatic installation.
+  run_installation
 
 else
 
