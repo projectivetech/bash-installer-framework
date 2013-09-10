@@ -182,11 +182,12 @@ done
 
 # Add autorun command line option.
 add_command_line_switch "run" "run" "r" "Run the installation automatically"
+add_command_line_switch "help" "help" "h" "Show this usage information"
 
 # Read command line arguments.
 log_info "Reading command line arguments..."
 process_command_line_options "$@"
-if [ $? -ne ${E_SUCCESS} ]; then
+if [ $? -ne ${E_SUCCESS} ] || has_command_line_switch? "help"; then
   usage
   exit ${E_FAILURE}
 fi
