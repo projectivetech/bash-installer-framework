@@ -94,4 +94,4 @@ if has_command_line_switch? <name>; then
 
 # License
 
-The installer framework is licensed under the MIT license. See `LICENSE` file for details. The `getopt` implementation in `utils/06_options.sh` has been written by [Aron Griffis](https://github.com/agriffis/pure-getopt/) and is licensed under the GNU GPLv3.
+The installer framework is licensed under the MIT license. See `LICENSE` file for details. The `getopt` implementation in `utils/06_options.sh` was written by [Aron Griffis](https://github.com/agriffis/pure-getopt/) and is licensed under the GNU GPLv3.
