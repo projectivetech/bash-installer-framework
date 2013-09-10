@@ -42,7 +42,7 @@ function install_packages_run() {
 
 ## Utilities
 
-The installer framework provides simple logging and UI utilities:
+The installer framework provides simple logging, UI, and command line option utilities:
 
 ### Logging
 
@@ -68,6 +68,30 @@ password=$(enter_hidden_variable "Please enter a password: ")
 ...
 ```
 
+### Command line options
+
+To add a command line option to the install script, use one of the following functions:
+
+```bash
+add_command_line_option <name> <longopt> <shortopt> <description> <default>
+add_command_line_switch <name> <longopt> <shortopt> <description>
+```
+
+A command line switch has a boolean value and always defaults to `false`. `name`, `longopt`, and `shortopt` may not contain spaces.
+
+To retrieve the command line option's values, use something like either
+
+```bash
+local var=$(get_command_line_option <name>)
+```
+
+or
+
+```bash
+if has_command_line_switch? <name>; then
+  ...
+```
+
 # License
 
-The installer framework is licensed under the MIT license. See `LICENSE` file for details.
+The installer framework is licensed under the MIT license. See `LICENSE` file for details. The `getopt` implementation in `utils/06_options.sh` was written by [Aron Griffis](https://github.com/agriffis/pure-getopt/) and is licensed under the GNU GPLv3.

@@ -27,7 +27,7 @@ TASKS_DIR=${INSTALLER_PATH}/tasks
 USER_CONFIG=${INSTALLER_PATH}/config.sh
 
 # Array of log severity values that go both to stdout and the logfile.
-LOG_STDOUT=( "ERROR" "IMPORTANT" "WARNING" "START" "FINISH" )
+LOG_STDOUT=( "ERROR" "IMPORTANT" "WARNING" "INFO" "SKIP" "START" "FINISH" )
 
 ############################## User configuration #############################
 
@@ -180,12 +180,22 @@ do
   task_load ${task}
 done
 
+# Add autorun command line option.
+add_command_line_switch "run" "run" "r" "Run the installation automatically"
+add_command_line_switch "help" "help" "h" "Show this usage information"
+
 # Read command line arguments.
 log_info "Reading command line arguments..."
-if [ $# -ge 1 ]; then
-  
-  # TODO: Fully Automatic installation.
-  echo "Fully automatic installation not yet implemented."
+process_command_line_options "$@"
+if [ $? -ne ${E_SUCCESS} ] || has_command_line_switch? "help"; then
+  usage
+  exit ${E_FAILURE}
+fi
+
+if has_command_line_switch? "run"; then
+
+  # Automatic installation.
+  run_installation
 
 else
 
