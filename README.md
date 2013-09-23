@@ -92,6 +92,17 @@ if has_command_line_switch? <name>; then
   ...
 ```
 
+### Semantic Versioning
+
+You can extract parts from semantic version numbers (i.e., `<major>.<minor>.<patch>`) or compare semantic version numbers using the following functions:
+
+```bash
+local major=$(semver_major "1.2.3")
+
+if semver_eq "1.2.3" "1.2.3"; then
+  ...
+```
+
 # License
 
-The installer framework is licensed under the MIT license. See `LICENSE` file for details. The `getopt` implementation in `utils/06_options.sh` was written by [Aron Griffis](https://github.com/agriffis/pure-getopt/) and is licensed under the GNU GPLv3.
+The installer framework is licensed under the MIT license. See `LICENSE` file for details. The `getopt` implementation in `utils/06_options.sh` was written by [Aron Griffis](https://github.com/agriffis/pure-getopt/) and is licensed under the GNU GPLv3. The `semver` comparison utilities in `utils/07_semver.sh` were written by folks at [Cloudflare](https://github.com/cloudflare/semver_bash) are BSD 2-clause-licensed, and have been heavily adapted, plus its support for `SPECIAL` suffixes has been removed.
