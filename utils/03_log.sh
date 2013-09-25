@@ -87,11 +87,21 @@ function _log() {
   ) >> ${logfile}
 }
 
-function log_init() {
-  local now=$(date "+%y%m%d%H%M%S")
-  local filename="install.sh.${now}.log"
 
-  dictSet "log" "file" ${filename}
+
+function log_init() {
+  # Rotate the logs.
+  local i=0 j=0
+  while [ -e "install.${i}.log" ]; do i=$(($i+1)); done
+  while [ ${i} -gt 0 ]; do
+    j=$(($i-1))
+    mv install.${j}.log install.${i}.log
+    i=${j}
+  done
+
+  # Create empty file.
+  local logfile="install.0.log"
+  dictSet "log" "file" ${logfile}
   touch "${filename}"
 }
 
