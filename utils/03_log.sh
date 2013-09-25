@@ -159,7 +159,7 @@ function log_command() {
 
   (
     eval "$@"
-  ) >> ${logfile}
+  ) &>> ${logfile}
 
   return $?
 }
