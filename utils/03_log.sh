@@ -100,7 +100,9 @@ function log_init() {
   done
 
   # Create empty file.
-  local logfile="install.0.log"
+  # NOTE: We need the absolute path here since log_command may
+  # be called from a different working directory.
+  local logfile="(pwd)/install.0.log"
   dictSet "log" "file" ${logfile}
   touch "${logfile}"
 }
@@ -157,10 +159,6 @@ function log_command() {
   assert "$# -ge 0"
   local logfile=$(dictGet "log" "file")
 
-  (
-    eval "$@"
-  ) &>> ${logfile}
-
+  "$@" >>${logfile} 2>&1
   return $?
 }
-
