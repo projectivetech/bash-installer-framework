@@ -557,7 +557,7 @@ function process_command_line_options() {
       break
     else
       for var in ${OPTIONS[@]}; do
-        local short=$(dictGet "command_line_option_${var}" "long") long=$(dictGet "command_line_option_${var}" "long")
+        local short=$(dictGet "command_line_option_${var}" "short") long=$(dictGet "command_line_option_${var}" "long")
 
         if [ "$1" == "-${short}" -o "$1" == "--${long}" ]; then
           shift
