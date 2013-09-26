@@ -183,6 +183,7 @@ done
 # Add autorun command line option.
 add_command_line_switch "run" "run" "r" "Run the installation automatically"
 add_command_line_switch "help" "help" "h" "Show this usage information"
+add_command_line_switch "debug" "debug" "d" "Enter debug console (for development)"
 
 # Read command line arguments.
 log_info "Reading command line arguments..."
@@ -192,7 +193,12 @@ if [ $? -ne ${E_SUCCESS} ] || has_command_line_switch? "help"; then
   exit ${E_FAILURE}
 fi
 
-if has_command_line_switch? "run"; then
+if has_command_line_switch? "debug"; then
+
+  # Debug console.
+  enter_debug_console
+
+elif has_command_line_switch? "run"; then
 
   # Automatic installation.
   run_installation
