@@ -102,7 +102,7 @@ function log_init() {
   # Create empty file.
   # NOTE: We need the absolute path here since log_command may
   # be called from a different working directory.
-  local logfile="(pwd)/install.0.log"
+  local logfile="$(pwd)/install.0.log"
   dictSet "log" "file" ${logfile}
   touch "${logfile}"
 }
