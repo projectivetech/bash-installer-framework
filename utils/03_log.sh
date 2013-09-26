@@ -102,7 +102,7 @@ function log_init() {
   # Create empty file.
   local logfile="install.0.log"
   dictSet "log" "file" ${logfile}
-  touch "${filename}"
+  touch "${logfile}"
 }
 
 function log_important() {
