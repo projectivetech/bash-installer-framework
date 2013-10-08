@@ -42,7 +42,7 @@ function install_packages_run() {
 
 ## Utilities
 
-The installer framework provides simple logging, UI, and command line option utilities:
+The installer framework provides simple logging, UI, templating, and command line option utilities:
 
 ### Logging
 
@@ -72,6 +72,22 @@ Please note that the `enter_variable` and `enter_hidden_variable` calls now pres
 
 ```
 port=$(enter_variable "Please enter the port." "80")
+
+### Templating
+
+As writing a configuraton file is a pretty common task for an installer, I implemented a simple templating engine, borrowing ideas from [here](http://qa.ubuntu.com/2012/09/20/a-basic-templating-engine-in-bash/) and the syntax from [ERuby](http://en.wikipedia.org/wiki/ERuby). Call like this:
+
+```
+render_template "srcfile" "dstfile" "var1" "val1" "var2" "val2" ...
+```
+
+`srcfile` may look like this:
+
+```
+This is a templating source file with <%= var1 %> and <%= var 2 %>.
+```
+
+See `tasks/05_come_down.sh` for an example.
 
 ### Command line options
 

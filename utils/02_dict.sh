@@ -38,6 +38,16 @@ function dictIsSet?() {
   fi
 }
 
+function dictClean() {
+  assert_eq $# 1
+  local dict=$1
+
+  local gvars=$(compgen -A variable | grep ${dict})
+  for gvar in ${gvars}; do
+    unset ${gvar}
+  done
+}
+
 function dictToFile() {
   assert_eq $# 1
   local dict=$1
