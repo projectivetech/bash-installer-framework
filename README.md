@@ -59,14 +59,19 @@ if ask "Are you sure?"; then
   ...
 fi
 
-username=$(enter_variable "Please enter your username: ")
+username=$(enter_variable "Please enter your username.")
 if [ -z ${username} ]; then
   # The user didn't enter anything! Error out.
 fi
 
-password=$(enter_hidden_variable "Please enter a password: ")
+password=$(enter_hidden_variable "Please enter a password.")
 ...
 ```
+
+Please note that the `enter_variable` and `enter_hidden_variable` calls now present a default prompt `>> ` to the user, so there is no need to put `: ` after your message. Additionally, `enter_variable` now takes an optional second default value parameter.
+
+```
+port=$(enter_variable "Please enter the port." "80")
 
 ### Command line options
 

@@ -7,7 +7,10 @@ function his_highness_init() {
 function his_highness_run() {
   log_info "Oooh yeah."
   
-  password=$(enter_variable_hidden "Please enter a password: ")
+  teatime=$(enter_variable "Please enter the time." "4:20pm")
+  log_important "Ok, the time is ${teatime}!"
+
+  password=$(enter_variable_hidden "Please enter a password.")
   if [ -z ${password} ]; then
     log_error "You really need to enter a password."
     return ${E_FAILURE}

@@ -85,6 +85,15 @@ function assert_eq() {
   assert "${1} -eq ${2}"
 }
 
+function assert_range() {
+  if [ $# -ne 3 ]
+  then
+    _assert_fail "assert_range called with wrong number of parameters!"
+  fi
+
+  assert "${1} -ge ${2} -a ${1} -le ${3}"
+}
+
 function assert_function() {
   if [ $# -ne 1 ]
   then
