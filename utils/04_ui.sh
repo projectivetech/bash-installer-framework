@@ -36,12 +36,24 @@ function ask() {
 }
 
 # Let the user enter a variable.
+# Optionally specify a default value.
 function enter_variable() {
-  assert_eq $# 1
+  assert_range $# 1 2
   local message=$1
   local var=""
 
-  read -p "${message}" var
+  if [ $# -eq 2 ]; then
+    local default=$2
+
+    read -p "${message} [${default}] >> " var
+
+    if [ -z ${var} ]; then
+      var=${default}
+    fi
+  else
+    read -p "${message} >> " var
+  fi
+
   echo ${var}
 }
 
@@ -51,7 +63,7 @@ function enter_variable_hidden() {
   local message=$1
   local var=""
 
-  read -s -p "${message}" var
+  read -s -p "${message} >> " var
   echo >&2 # Print the newline to stdout explicitly, since read -s gobbles it away.
   echo ${var}
 }
