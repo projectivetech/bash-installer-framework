@@ -5,6 +5,12 @@
 YES=${TRUE}
 NO=${FALSE}
 
+# Clear stdin.
+function _ui_clear_stdin() {
+  local dummy
+  read -t 0.1 -n 100000 dummy
+}
+
 # Ask the user a yes/no question.
 # Returns ${TRUE} for yes, ${FALSE} for no.
 # If the user aborts the question by hitting
@@ -12,6 +18,9 @@ NO=${FALSE}
 # unless otherwise specified in the second parameter.
 function ask() {
   assert "$# -ge 1"
+
+  _ui_clear_stdin
+
   local message=$1
   if [ $# -gt 1 ]; then
     local default=$2
@@ -39,6 +48,9 @@ function ask() {
 # Optionally specify a default value.
 function enter_variable() {
   assert_range $# 1 2
+
+  _ui_clear_stdin
+
   local message=$1
   local var=""
 
@@ -60,6 +72,9 @@ function enter_variable() {
 # Let the user enter a hidden variable (e.g., password).
 function enter_variable_hidden() {
   assert_eq $# 1
+
+  _ui_clear_stdin
+
   local message=$1
   local var=""
 
@@ -73,6 +88,9 @@ function enter_variable_hidden() {
 # http://mywiki.wooledge.org/BashFAQ/098
 function dispatch_msg() {
   assert_eq $# 1
+
+  _ui_clear_stdin
+
   local msg=$1
 
   # Check if the user has defined a callback.
