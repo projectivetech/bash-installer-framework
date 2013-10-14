@@ -8,7 +8,7 @@ NO=${FALSE}
 # Clear stdin.
 function _ui_clear_stdin() {
   local dummy
-  read -t 0.1 -n 100000 dummy
+  read -r -t 1 -n 100000 dummy
 }
 
 # Ask the user a yes/no question.
