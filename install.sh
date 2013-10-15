@@ -12,16 +12,16 @@ else
   fi
 fi
 
-############################## Global constants ###############################
-
 # TODO: This is bad.
 # First, $SUDO_USER may not be set depending on the sudo version installed on
-# the resp. OS. Second, we should better adapt the failing line 13 to work
+# the resp. OS. Second, we should better adapt the failing line 27 to work
 # a different way.
 if [ ! -z ${SUDO_USER} ]; then
   echo "Please run the script as root, not via sudo."
   exit 1
 fi
+
+############################## Global constants ###############################
 
 # Path to install script, no matter from where it is called.
 INSTALLER_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
