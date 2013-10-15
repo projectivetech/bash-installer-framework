@@ -1,3 +1,17 @@
+############################## Please use bash ################################
+
+# bash => 3.
+if [ -z ${BASH} ]; then
+  echo "Please run the script using the bash interpreter"
+  exit 1
+else
+  bash_major_version=${BASH_VERSION:0:1}
+  if [ ${bash_major_version} -lt 3 ]; then
+    echo "Please run the script using bash version 3 or greater"
+    exit 1
+  fi
+fi
+
 ############################## Global constants ###############################
 
 # TODO: This is bad.
@@ -36,18 +50,6 @@ if [ -f ${USER_CONFIG} ]; then
 fi
 
 ############################## Initial checks #################################
-
-# bash => 3.
-if [ -z ${BASH} ]; then
-  echo "Please run the script using the bash interpreter"
-  exit 1
-else
-  bash_major_version=${BASH_VERSION:0:1}
-  if [ ${bash_major_version} -lt 3 ]; then
-    echo "Please run the script using bash version 3 or greater"
-    exit 1
-  fi
-fi
 
 # root.
 if [ ${ROOT_ONLY} -gt 0 ] && [ ${USER} != "root" ]; then
