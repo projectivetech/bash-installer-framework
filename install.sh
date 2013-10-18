@@ -1,13 +1,27 @@
-############################## Global constants ###############################
+############################## Please use bash ################################
+
+# bash => 3.
+if [ -z ${BASH} ]; then
+  echo "Please run the script using the bash interpreter"
+  exit 1
+else
+  bash_major_version=${BASH_VERSION:0:1}
+  if [ ${bash_major_version} -lt 3 ]; then
+    echo "Please run the script using bash version 3 or greater"
+    exit 1
+  fi
+fi
 
 # TODO: This is bad.
 # First, $SUDO_USER may not be set depending on the sudo version installed on
-# the resp. OS. Second, we should better adapt the failing line 13 to work
+# the resp. OS. Second, we should better adapt the failing line 27 to work
 # a different way.
 if [ ! -z ${SUDO_USER} ]; then
   echo "Please run the script as root, not via sudo."
   exit 1
 fi
+
+############################## Global constants ###############################
 
 # Path to install script, no matter from where it is called.
 INSTALLER_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -36,18 +50,6 @@ if [ -f ${USER_CONFIG} ]; then
 fi
 
 ############################## Initial checks #################################
-
-# bash => 3.
-if [ -z ${BASH} ]; then
-  echo "Please run the script using the bash interpreter"
-  exit 1
-else
-  bash_major_version=${BASH_VERSION:0:1}
-  if [ ${bash_major_version} -lt 3 ]; then
-    echo "Please run the script using bash version 3 or greater"
-    exit 1
-  fi
-fi
 
 # root.
 if [ ${ROOT_ONLY} -gt 0 ] && [ ${USER} != "root" ]; then
@@ -163,6 +165,32 @@ function single_task_menu() {
   return $?
 }
 
+function skip_unwanted_tasks() {
+  if [ ! -z "$(get_command_line_option tasks)" ]; then
+    local tasklist_str=$(get_command_line_option "tasks")
+    local tasklist=(${tasklist_str//,/ })
+    local skiplist=()
+
+    # First check if each task is actually known.
+    for task in ${tasklist[@]}; do
+      if ! array_contains? ${task} "${TASKS[@]}"; then
+        echo "Task ${task} not found." >&2
+        echo "Tasks are: ${TASKS[@]}"
+        return ${E_FAILURE}
+      fi
+    done
+
+    # Skip unselected tasks.
+    for task in ${TASKS[@]}; do
+      if ! array_contains? ${task} "${tasklist[@]}"; then
+        skip_unskip_task ${task}
+      fi
+    done
+  fi
+
+  return ${E_SUCCESS}
+}
+
 ############################## Main app #######################################
 
 # Load our utility modules.
@@ -184,12 +212,19 @@ done
 add_command_line_switch "run" "run" "r" "Run the installation automatically"
 add_command_line_switch "help" "help" "h" "Show this usage information"
 add_command_line_switch "debug" "debug" "d" "Enter debug console (for development)"
+add_command_line_option "tasks" "tasks" "t" "List of tasks to execute (others will be skipped)" ""
 
 # Read command line arguments.
 log_info "Reading command line arguments..."
 process_command_line_options "$@"
 if [ $? -ne ${E_SUCCESS} ] || has_command_line_switch? "help"; then
   usage
+  exit ${E_FAILURE}
+fi
+
+# Skip other tasks if --tasks was given.
+skip_unwanted_tasks
+if [ $? -ne ${E_SUCCESS} ]; then
   exit ${E_FAILURE}
 fi
 

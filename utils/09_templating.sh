@@ -48,6 +48,14 @@ function render_template() {
 
   assert_file ${src}
 
+  if [ -e ${dst} ]; then
+    assert_file ${dst}
+
+    if ! ask "Configuration file ${dst} already exists. Should it be overwritten?"; then
+      return
+    fi
+  fi
+
   # Read in parameters into dict.
   _templating_read_parameters "$@"
 
