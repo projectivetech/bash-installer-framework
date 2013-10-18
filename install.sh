@@ -166,7 +166,7 @@ function single_task_menu() {
 }
 
 function skip_unwanted_tasks() {
-  if [ ! -z "$(get_command_line_option tasks)" ]; then
+  if [ "$(get_command_line_option tasks)" != "all" ]; then
     local tasklist_str=$(get_command_line_option "tasks")
     local tasklist=(${tasklist_str//,/ })
     local skiplist=()
@@ -212,7 +212,7 @@ done
 add_command_line_switch "run" "run" "r" "Run the installation automatically"
 add_command_line_switch "help" "help" "h" "Show this usage information"
 add_command_line_switch "debug" "debug" "d" "Enter debug console (for development)"
-add_command_line_option "tasks" "tasks" "t" "List of tasks to execute (others will be skipped)" ""
+add_command_line_option "tasks" "tasks" "t" "List of tasks to execute (others will be skipped)" "all"
 
 # Read command line arguments.
 log_info "Reading command line arguments..."
