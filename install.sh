@@ -165,6 +165,32 @@ function single_task_menu() {
   return $?
 }
 
+function skip_unwanted_tasks() {
+  if [ ! -z "$(get_command_line_option tasks)" ]; then
+    local tasklist_str=$(get_command_line_option "tasks")
+    local tasklist=(${tasklist_str//,/ })
+    local skiplist=()
+
+    # First check if each task is actually known.
+    for task in ${tasklist[@]}; do
+      if ! array_contains? ${task} "${TASKS[@]}"; then
+        echo "Task ${task} not found." >&2
+        echo "Tasks are: ${TASKS[@]}"
+        return ${E_FAILURE}
+      fi
+    done
+
+    # Skip unselected tasks.
+    for task in ${TASKS[@]}; do
+      if ! array_contains? ${task} "${tasklist[@]}"; then
+        skip_unskip_task ${task}
+      fi
+    done
+  fi
+
+  return ${E_SUCCESS}
+}
+
 ############################## Main app #######################################
 
 # Load our utility modules.
@@ -186,12 +212,19 @@ done
 add_command_line_switch "run" "run" "r" "Run the installation automatically"
 add_command_line_switch "help" "help" "h" "Show this usage information"
 add_command_line_switch "debug" "debug" "d" "Enter debug console (for development)"
+add_command_line_option "tasks" "tasks" "t" "List of tasks to execute (others will be skipped)" ""
 
 # Read command line arguments.
 log_info "Reading command line arguments..."
 process_command_line_options "$@"
 if [ $? -ne ${E_SUCCESS} ] || has_command_line_switch? "help"; then
   usage
+  exit ${E_FAILURE}
+fi
+
+# Skip other tasks if --tasks was given.
+skip_unwanted_tasks
+if [ $? -ne ${E_SUCCESS} ]; then
   exit ${E_FAILURE}
 fi
 
