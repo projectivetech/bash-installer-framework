@@ -107,20 +107,20 @@ function task_skip?() {
 }
 
 # Returns ${TRUE} if a task has been completed, ${FALSE} otherwise.
-function task_done?() {
+function task_done_or_skipped?() {
   assert_eq $# 1
   local task=$1
 
-  if [ $(dictGet ${task} "status") != ${T_STATUS_DONE} ]; then
-    return ${FALSE}
-  else
+  if [ $(dictGet ${task} "status") == ${T_STATUS_DONE} ] || [ $(dictGet ${task} "status") == ${T_STATUS_SKIP} ]; then
     return ${TRUE}
+  else
+    return ${FALSE}
   fi
 }
 
 # Returns ${TRUE} if all tasks are done, ${FALSE} otherwise.
 function all_tasks_done?() {
-  tasks_each "task_done?"
+  tasks_each "task_done_or_skipped?"
   return $?
 }
 
