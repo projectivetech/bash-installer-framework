@@ -81,7 +81,7 @@ function run_installation_task() {
   local task=$1
 
   # Already completed?
-  if [ $(dictGet ${task} "status") -eq ${T_STATUS_DONE} ]; then
+  if task_done? ${task}; then
     return ${TRUE}
   fi
 
