@@ -13,6 +13,11 @@ function _templating_read_parameters() {
     val=$1
     shift
 
+    # Store empty variables in dict.
+    if [ -z "${val}" ]; then
+      val="__nil"
+    fi
+
     dictSet "render_template" "${var}" "${val}"
   done
 }
@@ -31,6 +36,11 @@ function _templating_real_render_template() {
 
         # Lookup variable (will fail if not set).
         val=$(dictGet "render_template" "${var}")
+
+        # Restore empty variables.
+        if [ "${val}" == "__nil" ]; then
+          val=""
+        fi
 
         line=${line//${tok}/${val}}
       done

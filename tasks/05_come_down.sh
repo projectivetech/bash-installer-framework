@@ -12,9 +12,10 @@ function come_down_run() {
 Lalala
 This is a <%= test %>.
 With <%=multiple%> <%=   statements  %> in a line.
+Even an <%= empty %> variable.
 EOF
 
-  render_template "template_file" "render_file" "test" "success" "multiple" "more than one" "statements" "variables"
+  render_template "template_file" "render_file" "test" "success" "multiple" "more than one" "statements" "variables" "empty" ""
 
   return ${E_SUCCESS}
 }

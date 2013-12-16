@@ -107,6 +107,18 @@ function task_skip?() {
 }
 
 # Returns ${TRUE} if a task has been completed, ${FALSE} otherwise.
+function task_done?() {
+  assert_eq $# 1
+  local task=$1
+
+  if [ $(dictGet ${task} "status") -eq ${T_STATUS_DONE} ]; then
+    return ${TRUE}
+  else
+    return ${FALSE}
+  fi
+}
+
+# Returns ${TRUE} if a task has been completed or marked to be skipped, ${FALSE} otherwise.
 function task_done_or_skipped?() {
   assert_eq $# 1
   local task=$1
