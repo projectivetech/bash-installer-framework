@@ -54,12 +54,16 @@ function semver_lt() {
   assert_eq $# 2
   local semver1=$1 semver2=$2
 
-  if [ $(semver_major ${semver1}) -lt $(semver_major ${semver2}) ]; then
+  if [ $(semver_major ${semver2}) -gt $(semver_major ${semver1}) ]; then
     return ${TRUE}
-  elif [ $(semver_minor ${semver1}) -lt $(semver_minor ${semver2}) ]; then
-    return ${TRUE}
-  elif [ $(semver_patch ${semver1}) -lt $(semver_patch ${semver2}) ]; then
-    return ${TRUE}
+  elif [ $(semver_major ${semver2}) -eq $(semver_major ${semver1}) ]; then
+    if [ $(semver_minor ${semver2}) -gt $(semver_minor ${semver1}) ]; then
+      return ${TRUE}
+    elif [ $(semver_minor ${semver2}) -eq $(semver_minor ${semver1}) ]; then
+      if [ $(semver_patch ${semver2}) -gt $(semver_patch ${semver1}) ]; then
+        return ${TRUE}
+      fi
+    fi
   fi
 
   return ${FALSE}
