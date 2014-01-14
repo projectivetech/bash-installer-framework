@@ -7,7 +7,10 @@
 # 'installation_complete', and 'installation_incomplete'.
 
 # Set to 1 to enforce root installations.
-#ROOT_ONLY=1
+#ROOT_ONLY=0
+
+# Overwrite to disable the initial touch-all-files.
+#INITIAL_TOUCH_ALL=1
 
 # Overwrite default utils & tasks directories.
 #UTILS_DIR=${INSTALLER_PATH}/data/utils
@@ -15,6 +18,7 @@
 
 # Overwrite default log-to-stdout config.
 #LOG_STDOUT=( "ERROR" "IMPORTANT" "WARNING" "INFO" "SKIP" "START" "FINISH" )
+
 
 function welcome() {
   echo -e "\e[00;32mWelcome to the new and shiny installer framework!\e[00m"
