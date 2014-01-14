@@ -31,6 +31,9 @@ INSTALLER_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # Set to 1 to allow only the root user to execute the script.
 ROOT_ONLY=0
 
+# Set to 0 to disable the initial touch-all-files action.
+INITIAL_TOUCH_ALL=1
+
 # Path to installer utils.
 UTILS_DIR=${INSTALLER_PATH}/utils
 
@@ -61,6 +64,13 @@ fi
 grep -V >/dev/null 2>&1 || { echo "Please install 'grep'"; exit 1; }
 sed --version >/dev/null 2>&1 || { echo "Please install 'sed'"; exit 1; }
 date --version >/dev/null 2>&1 || { echo "Please install 'date'"; exit 1; }
+
+############################## Initial-touch-all ##############################
+
+# Update all timestamps to avoid any 'file comes from the future' errors.
+if [ ${INITIAL_TOUCH_ALL} -gt 0 ]; then
+  find ${INSTALLER_PATH} -exec touch "{}" \;
+fi
 
 ############################## Some functions #################################
 
