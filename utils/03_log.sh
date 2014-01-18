@@ -14,29 +14,29 @@
 
 function _color_code() {
   assert_eq $# 1
-  local severity=$1 color="\e[00m"
+  local severity=$1 color="$(tput setaf 1)"
 
   case ${severity} in
     "IMPORTANT")
-      color="\e[00;32m"
+      color="$(tput setaf 1)"
       ;;
     "ERROR")
-      color="\e[00;31m"
+      color="$(tput setaf 1)"
       ;;
     "INFO")
-      color="\e[00;35m"
+      color="$(tput setaf 4)"
       ;;
     "WARNING")
-      color="\e[01;33m"
+      color="$(tput setaf 3)"
       ;;
     "START")
-      color="\e[00;35m"
+      color="$(tput setaf 2)"
       ;;
     "FINISH")
-      color="\e[00;35m"
+      color="$(tput setaf 2)"
       ;;
     "SKIP")
-      color="\e[01;33m"
+      color="$(tput setaf 2)"
       ;;
   esac
 
@@ -68,7 +68,7 @@ function _log() {
 
   # Check if we should also log to stdout.
   if _log_to_stdout? ${severity}; then
-    local uncolor="\e[0;00m"
+    local uncolor="$(tput sgr0)"
     local color=$(_color_code ${severity})
     echo -e "${color}${severity}: ${msg}${uncolor}"
   fi
