@@ -61,9 +61,9 @@ if [ ${ROOT_ONLY} -gt 0 ] && [ ${USER} != "root" ]; then
 fi
 
 # Tools.
-grep -V >/dev/null 2>&1 || { echo "Please install 'grep'"; exit 1; }
-sed --version >/dev/null 2>&1 || { echo "Please install 'sed'"; exit 1; }
-date --version >/dev/null 2>&1 || { echo "Please install 'date'"; exit 1; }
+type grep >/dev/null 2>&1 || { echo >&2 "Please install 'grep'"; exit 1; }
+type sed >/dev/null 2>&1 || { echo >&2 "Please install 'sed'"; exit 1; }
+type date >/dev/null 2>&1 || { echo >&2 "Please install 'date'"; exit 1; }
 
 ############################## Initial-touch-all ##############################
 
