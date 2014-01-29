@@ -15,6 +15,13 @@ function dictSet() {
   eval "${dict}_${key}=\"$value\"" # s/eval/evil/
 }
 
+# Set dictionary entry and write to file immediately.
+function dictSet!() {
+  dictSet $@
+  local dict=$1
+  dictToFile ${dict}
+}
+
 function dictGet() {
   assert_eq $# 2
   local dict=$1 key=$2
