@@ -7,6 +7,9 @@ function his_highness_init() {
 function his_highness_run() {
   log_info "Oooh yeah."
   
+  number=$(enter_variable_numeric "Please enter a number." "42")
+  log_important "You entered ${number}!"
+
   teatime=$(enter_variable "Please enter the time." "4:20pm")
   log_important "Ok, the time is ${teatime}!"
 
@@ -15,6 +18,7 @@ function his_highness_run() {
     log_error "You really need to enter a password."
     return ${E_FAILURE}
   fi
+
 
   # Let's retrieve some data from another task.
   local smoked=$(whatdidismoke)
