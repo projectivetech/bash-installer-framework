@@ -51,6 +51,23 @@ function _templating_real_render_template() {
   set +f
 }
 
+function render_template_overwrite() {
+  assert "$# -ge 2"
+  local src=$1 dst=$2
+  shift; shift
+
+  assert_file ${src}
+
+  # Read in parameters into dict.
+  _templating_read_parameters "$@"
+
+  # Render!
+  _templating_real_render_template ${src} ${dst}
+
+  # Clean dictionary.
+  dictClean "render_template"
+}
+
 function render_template() {
   assert "$# -ge 2"
   local src=$1 dst=$2
