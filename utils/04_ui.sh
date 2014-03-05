@@ -11,6 +11,12 @@ function _ui_clear_stdin() {
   read -r -t 1 -n 100000 dummy
 }
 
+# Check for numeric value.
+function _ui_is_numeric?() {
+  printf "%d" "$1" > /dev/null 2>&1
+  return $?
+}
+
 # Ask the user a yes/no question.
 # Returns ${TRUE} for yes, ${FALSE} for no.
 # If the user aborts the question by hitting
@@ -80,6 +86,23 @@ function enter_variable_hidden() {
 
   read -s -p "${message} >> " var
   echo >&2 # Print the newline to stdout explicitly, since read -s gobbles it away.
+  echo ${var}
+}
+
+# Let the user enter a numberic variable.
+function enter_variable_numeric() {
+  assert_range $# 1 2
+
+  local var=""
+
+  while true; do
+    var=$(enter_variable "$@")
+
+    if _ui_is_numeric? ${var}; then
+      break
+    fi
+  done
+
   echo ${var}
 }
 
