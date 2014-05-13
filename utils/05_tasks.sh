@@ -232,6 +232,9 @@ function run_task() {
   local task=$1
   local shortname=$(dictGet ${task} "shortname")
 
+  # Save the status (saves the skip as well).
+  dictToFile ${task}
+
   # Check whether task has been marked to be skip.
   if task_skip? ${task}; then
     log_task_skip ${task}
