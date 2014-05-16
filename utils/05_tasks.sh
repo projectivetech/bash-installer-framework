@@ -222,6 +222,9 @@ function skip_unskip_task() {
   else
     task_skip! ${task}
   fi
+
+  # Save the skip.
+  dictToFile ${task}
   
   return ${E_SUCCESS}
 }
@@ -231,9 +234,6 @@ function run_task() {
   assert_eq $# 1
   local task=$1
   local shortname=$(dictGet ${task} "shortname")
-
-  # Save the status (saves the skip as well).
-  dictToFile ${task}
 
   # Check whether task has been marked to be skip.
   if task_skip? ${task}; then
