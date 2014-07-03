@@ -53,19 +53,24 @@ function _templating_real_render_template() {
 
 function render_template_overwrite() {
   assert "$# -ge 2"
-  local src=$1 dst=$2
-  shift; shift
+  local dst=$2
 
-  assert_file ${src}
+  if [ -f "${dst}" ]; then
+    rm "${dst}"
+  fi
 
-  # Read in parameters into dict.
-  _templating_read_parameters "$@"
+  render_template "$@"
+}
 
-  # Render!
-  _templating_real_render_template ${src} ${dst}
+function render_template_no_overwrite() {
+  assert "$# -ge 2"
+  local dst=$2
 
-  # Clean dictionary.
-  dictClean "render_template"
+  if [ -f "${dst}" ]; then
+    log_info "Not writing ${dst} since it already exists."
+  else
+    render_template "$@"
+  fi
 }
 
 function render_template() {
@@ -73,9 +78,9 @@ function render_template() {
   local src=$1 dst=$2
   shift; shift
 
-  assert_file ${src}
+  assert_file "${src}"
 
-  if [ -e ${dst} ]; then
+  if [ -e "${dst}" ]; then
     assert_file ${dst}
 
     if ! ask "Configuration file ${dst} already exists. Should it be overwritten?"; then
