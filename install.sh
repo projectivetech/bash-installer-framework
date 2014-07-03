@@ -34,6 +34,9 @@ ROOT_ONLY=0
 # Set to 0 to disable the initial touch-all-files action.
 INITIAL_TOUCH_ALL=1
 
+# Set to 0 to disable task dependency checking.
+TASK_DEPENDENCY_CHECKING=1
+
 # Path to installer utils.
 UTILS_DIR=${INSTALLER_PATH}/utils
 

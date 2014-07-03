@@ -12,6 +12,9 @@
 # Overwrite to disable the initial touch-all-files.
 #INITIAL_TOUCH_ALL=1
 
+# Overwrite to disable task dependency checking.
+#TASK_DEPENDENCY_CHECKING=1
+
 # Overwrite default utils & tasks directories.
 #UTILS_DIR=${INSTALLER_PATH}/data/utils
 #TASKS_DIR=${INSTALLER_PATH}/data/tasks
