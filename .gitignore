@@ -3,3 +3,4 @@ render_file
 template_file
 second_template_file
 ts*run
+.*.status
