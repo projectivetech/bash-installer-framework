@@ -222,6 +222,9 @@ function skip_unskip_task() {
   else
     task_skip! ${task}
   fi
+
+  # Save the skip.
+  dictToFile ${task}
   
   return ${E_SUCCESS}
 }
@@ -232,9 +235,6 @@ function run_task() {
   local task=$1
   local shortname=$(dictGet ${task} "shortname")
 
-  # Save the status (saves the skip as well).
-  dictToFile ${task}
-
   # Check whether task has been marked to be skip.
   if task_skip? ${task}; then
     log_task_skip ${task}
@@ -242,12 +242,14 @@ function run_task() {
   fi
 
   # Check whether the dependencies are met.
-  if ! all_dependencies_done? ${task}; then
-    # Ask the user whether he really would like to continue.
-    ask "Task ${shortname} has unsatisfied dependencies. Would you really like to run it?"
-    if [ $? -eq ${NO} ]; then
-      return ${E_FAILURE}
-    fi    
+  if [ ${TASK_DEPENDENCY_CHECKING} -gt 0 ]; then
+    if ! all_dependencies_done? ${task}; then
+      # Ask the user whether he really would like to continue.
+      ask "Task ${shortname} has unsatisfied dependencies. Would you really like to run it?"
+      if [ $? -eq ${NO} ]; then
+        return ${E_FAILURE}
+      fi
+    fi
   fi
 
   # Log the task run.

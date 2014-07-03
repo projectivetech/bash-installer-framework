@@ -17,5 +17,12 @@ EOF
 
   render_template "template_file" "render_file" "test" "success" "multiple" "more than one" "statements" "variables" "empty" ""
 
+  cat > second_template_file <<EOF
+This file has been written at <%= timestamp %>.
+EOF
+
+  render_template_overwrite "second_template_file" "ts_current_run" "timestamp" "$(date)"
+  render_template_no_overwrite "second_template_file" "ts_first_run" "timestamp" "$(date)"
+
   return ${E_SUCCESS}
 }
