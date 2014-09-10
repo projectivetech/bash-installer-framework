@@ -67,7 +67,7 @@ fi
 grep -V >/dev/null 2>&1 || { echo "Please install 'grep'."; exit 1; }
 sed --version >/dev/null 2>&1 || { echo "Please install 'sed'."; exit 1; }
 date --version >/dev/null 2>&1 || { echo "Please install 'date'."; exit 1; }
-awk --version >/dev/null 2>&1 || { echo "Please install 'awk'."; exit 1; }
+awk -W version >/dev/null 2>&1 || { echo "Please install 'awk'."; exit 1; }
 wget --version >/dev/null 2>&1 || { echo "Please install 'wget'."; exit 1; }
 
 ############################## Initial-touch-all ##############################

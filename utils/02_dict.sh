@@ -22,6 +22,18 @@ function dictSet!() {
   dictToFile ${dict}
 }
 
+function dictUnset() {
+  assert_eq $# 2
+  local dict=$1 key=$2
+  unset "${dict}_${key}"
+}
+
+function dictUnset!() {
+  dictUnset $@
+  local dict=$1
+  dictToFile ${dict}
+}
+
 function dictGet() {
   assert_eq $# 2
   local dict=$1 key=$2
