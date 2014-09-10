@@ -33,7 +33,7 @@ function _backtrace() {
 
 function assert_fail() {
   # Print assert errors to stderr!
-  echo "assert failed: \"$1\"" >&2
+  echo "assert failed: \"$@\"" >&2
   _backtrace >&2
 
   # And crash immediately.
