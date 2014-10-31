@@ -18,7 +18,7 @@ function _color_code() {
 
   case ${severity} in
     "IMPORTANT")
-      color="$(tput setaf 1)"
+      color="$(tput setaf 6)"
       ;;
     "ERROR")
       color="$(tput setaf 1)"
