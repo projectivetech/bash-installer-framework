@@ -72,6 +72,7 @@ Please note that the `enter_variable` and `enter_hidden_variable` calls now pres
 
 ```
 port=$(enter_variable "Please enter the port." "80")
+```
 
 ### Templating
 
