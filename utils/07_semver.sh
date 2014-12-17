@@ -86,7 +86,7 @@ function semver_valid?() {
   assert_eq $# 1
   local semver=$1
 
-  if [[ "${semver}" =~ ^[[:digit:]]+.[[:digit:]]+.[[:digit:]]+$ ]]; then
+  if [[ "${semver}" =~ ^[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+$ ]]; then
     return ${TRUE}
   else
     return ${FALSE}
