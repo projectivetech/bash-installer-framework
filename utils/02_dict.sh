@@ -61,17 +61,21 @@ function dictClean() {
   assert_eq $# 1
   local dict=$1
 
-  local gvars=$(compgen -A variable | grep ${dict})
+  local gvars=$(compgen -A variable | grep "^${dict}")
   for gvar in ${gvars}; do
     unset ${gvar}
   done
 }
 
 function dictToFile() {
-  assert_eq $# 1
+  assert "$# -ge 1"
   local dict=$1
   local file=".${dict}.status"
-  local gvars=$(compgen -A variable | grep ${dict})
+  local gvars=$(compgen -A variable | grep "^${dict}")
+
+  if [ $# -gt 1 ]; then
+    file=$2
+  fi
 
   # Print all variables to files.
   (
@@ -84,9 +88,13 @@ function dictToFile() {
 }
 
 function dictFromFile() {
-  assert_eq $# 1
+  assert "$# -ge 1"
   local dict=$1
   local file=".${dict}.status"
+
+  if [ $# -gt 1 ]; then
+    file=$2
+  fi
 
   # Read the status file if existent.
   if [ -e ${file} ]; then
