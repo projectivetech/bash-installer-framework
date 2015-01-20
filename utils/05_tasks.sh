@@ -52,6 +52,12 @@ function task_load() {
   ${taskname}_init
   # Load saved status.
   dictFromFile ${taskname}
+
+  # Run post-initialization (post-dict loading) stuff.
+  if [ "$(type -t ${taskname}_postinit)" = "function" ]; then
+    ${taskname}_postinit
+  fi
+
   # Append to list of tasks.
   TASKS+=(${taskname})
 }
