@@ -6,6 +6,10 @@ function ganja_seeding_init() {
   settings_init ".settings"
 }
 
+function ganja_seeding_skip() {
+  log_info "ganja_seeding_skip called"
+}
+
 function ganja_seeding_run() {
   log_info "Seeding some plants..."
 

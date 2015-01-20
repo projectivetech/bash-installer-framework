@@ -235,12 +235,6 @@ function run_task() {
   local task=$1
   local shortname=$(dictGet ${task} "shortname")
 
-  # Check whether task has been marked to be skip.
-  if task_skip? ${task}; then
-    log_task_skip ${task}
-    return ${E_SUCCESS}
-  fi
-
   # Check whether the dependencies are met.
   if [ ${TASK_DEPENDENCY_CHECKING} -gt 0 ]; then
     if ! all_dependencies_done? ${task}; then
@@ -273,4 +267,36 @@ function run_task() {
   dictToFile ${task}
 
   return ${result}
+}
+
+function run_or_skip_task() {
+  local task=$1
+
+  if task_done_or_skipped? ${task}; then
+    # Run skip method to setup stuff in subsequent installer runs.
+    if [ "$(type -t ${task}_skip)" == "function" ]; then
+      ${task}_skip
+    fi
+
+    if task_skip? ${task}; then
+      log_task_skip ${task}
+    fi
+
+    return ${E_SUCCESS}
+  fi
+
+  run_task ${task}
+
+  # Failure?
+  if [ $? -ne ${E_SUCCESS} ]; then
+    # Ask the user whether she would like to skip the failed task.
+    ask "Would you like to continue with the installation anyway?"
+    return $?
+  else
+    return ${TRUE}
+  fi
+}
+
+function run_all_tasks() {
+  tasks_each "run_or_skip_task"
 }

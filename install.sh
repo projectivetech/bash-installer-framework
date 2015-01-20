@@ -81,34 +81,14 @@ fi
 
 # Automatic installation.
 function run_installation() {
-  tasks_each "run_installation_task"
-  
+  run_all_tasks
+
   if all_tasks_done?; then
     dispatch_msg "installation_complete"
     return ${E_SUCCESS}
   else
     dispatch_msg "installation_incomplete"
     return ${E_FAILURE}
-  fi
-}
-
-function run_installation_task() {
-  local task=$1
-
-  # Already completed?
-  if task_done? ${task}; then
-    return ${TRUE}
-  fi
-
-  run_task ${task}
-
-  # Failure?
-  if [ $? -ne ${E_SUCCESS} ]; then
-    # Ask the user whether she would like to skip the failed task.
-    ask "Would you like to continue with the installation anyway?"
-    return $?
-  else
-    return ${TRUE}
   fi
 }
 
