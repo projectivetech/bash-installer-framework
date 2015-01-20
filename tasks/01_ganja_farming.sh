@@ -9,7 +9,9 @@ function ganja_farming_run() {
 
   # Let's test semantic versioning here.
   log_info "Major part of 10.20.30 is "$(semver_major 10.20.30)
-  
+
+  log_info "Some setting: $(settings_get "somesetting")"
+
   if semver_gt "1.2.10" "1.2.2"; then
     log_info "1.2.10 is greater than 1.2.2! Yeehaa."
   fi
