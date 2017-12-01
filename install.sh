@@ -58,7 +58,7 @@ fi
 ############################## Initial checks #################################
 
 # root.
-if [ ${ROOT_ONLY} -gt 0 ] && [ ${USER} != "root" ]; then
+if [ ${ROOT_ONLY} -gt 0 ] && [ $(whoami) != "root" ]; then
   echo "Please run the script as root user"
   exit 1
 fi
