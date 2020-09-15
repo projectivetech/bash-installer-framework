@@ -34,7 +34,7 @@ function ask() {
     local default=${FALSE}
   fi
 
-  echo ${message}
+  echo -e ${message}
   select yn in "Yes" "No"; do
     case ${yn} in
       "Yes")
