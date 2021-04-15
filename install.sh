@@ -49,6 +49,13 @@ USER_CONFIG=${INSTALLER_PATH}/config.sh
 # Array of log severity values that go both to stdout and the logfile.
 LOG_STDOUT=( "ERROR" "IMPORTANT" "WARNING" "INFO" "SKIP" "START" "FINISH" )
 
+# Require various programs to be installed
+REQUIRE_GREP=1
+REQUIRE_SED=1
+REQUIRE_DATE=1
+REQUIRE_AWK=1
+REQUIRE_WGET=1
+
 ############################## User configuration #############################
 
 if [ -f ${USER_CONFIG} ]; then
@@ -64,11 +71,21 @@ if [ ${ROOT_ONLY} -gt 0 ] && [ $(whoami) != "root" ]; then
 fi
 
 # Tools.
-grep -V >/dev/null 2>&1 || { echo "Please install 'grep'."; exit 1; }
-sed --version >/dev/null 2>&1 || { echo "Please install 'sed'."; exit 1; }
-date --version >/dev/null 2>&1 || { echo "Please install 'date'."; exit 1; }
-awk -W version >/dev/null 2>&1 || { echo "Please install 'awk'."; exit 1; }
-wget --version >/dev/null 2>&1 || { echo "Please install 'wget'."; exit 1; }
+if [ ${REQUIRE_GREP} -gt 0 ]; then
+  grep -V >/dev/null 2>&1 || { echo "Please install 'grep'."; exit 1; }
+fi
+if [ ${REQUIRE_SED} -gt 0 ]; then
+  sed --version >/dev/null 2>&1 || { echo "Please install 'sed'."; exit 1; }
+fi
+if [ ${REQUIRE_DATE} -gt 0 ]; then
+  date --version >/dev/null 2>&1 || { echo "Please install 'date'."; exit 1; }
+fi
+if [ ${REQUIRE_AWK} -gt 0 ]; then
+  awk -W version >/dev/null 2>&1 || { echo "Please install 'awk'."; exit 1; }
+fi
+if [ ${REQUIRE_WGET} -gt 0 ]; then
+  wget --version >/dev/null 2>&1 || { echo "Please install 'wget'."; exit 1; }
+fi
 
 ############################## Initial-touch-all ##############################
 

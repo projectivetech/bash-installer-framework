@@ -244,10 +244,14 @@ function run_task() {
   # Check whether the dependencies are met.
   if [ ${TASK_DEPENDENCY_CHECKING} -gt 0 ]; then
     if ! all_dependencies_done? ${task}; then
-      # Ask the user whether he really would like to continue.
-      ask "Task ${shortname} has unsatisfied dependencies. Would you really like to run it?"
-      if [ $? -eq ${NO} ]; then
+      if [[ "${INSTALLER_FRONTEND}" == "noninteractive" ]]; then
         return ${E_FAILURE}
+      else
+        # Ask the user whether he really would like to continue.
+        ask "Task ${shortname} has unsatisfied dependencies. Would you really like to run it?"
+        if [ $? -eq ${NO} ]; then
+          return ${E_FAILURE}
+        fi
       fi
     fi
   fi
@@ -295,9 +299,13 @@ function run_or_skip_task() {
 
   # Failure?
   if [ $? -ne ${E_SUCCESS} ]; then
-    # Ask the user whether she would like to skip the failed task.
-    ask "Would you like to continue with the installation anyway?"
-    return $?
+    if [[ "${INSTALLER_FRONTEND}" == "noninteractive" ]]; then
+      return ${FALSE}
+    else
+      # Ask the user whether she would like to skip the failed task.
+      ask "Would you like to continue with the installation anyway?"
+      return $?
+    fi
   else
     return ${TRUE}
   fi
