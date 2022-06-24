@@ -66,6 +66,7 @@ function task_load() {
 # Example:
 # task_setup "name" "shortname" "description"
 # task_setup "name" "shortname" "description" "dependencies"
+# task_setup "name" "shortname" "description" "dependencies" "subshell"
 function task_setup() {
   assert "$# -ge 3"
   assert "$# -le 5"
@@ -266,6 +267,7 @@ function run_task() {
 
   # Run the task.
   if ! dictIsSet? ${task} "subshell"; then
+    log_info "Running in subshell."
     ( ${task}_run )
   else
     ${task}_run
