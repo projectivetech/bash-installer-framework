@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 function ganja_smoking_init() {
-  task_setup "ganja_smoking" "Smoking" "Smoke the weed" "ganja_seeding ganja_farming ganja_harvesting"
+  task_setup "ganja_smoking" "Smoking" "Smoke the weed" "ganja_seeding ganja_farming ganja_harvesting" "true"
 }
 
 function ganja_smoking_run() {

@@ -68,15 +68,20 @@ function task_load() {
 # task_setup "name" "shortname" "description" "dependencies"
 function task_setup() {
   assert "$# -ge 3"
-  assert "$# -le 4"
+  assert "$# -le 5"
 
   local task=$1 shortname=$2 description=$3
   dictSet ${task} "shortname" "${shortname}"
   dictSet ${task} "description" "${description}"
 
-  if [ $# -eq 4 ]; then
+  if [ $# -gt 3 ]; then
     local dependencies=$4
     dictSet ${task} "dependencies" "${dependencies}"
+  fi
+
+  if [ $# -gt 4 ]; then
+    local subshell=$5
+    dictSet ${task} "subshell" "${subshell}"
   fi
 
   dictSet ${task} "status" ${T_STATUS_NOT_RUN}
@@ -260,7 +265,11 @@ function run_task() {
   log_task_start ${task}
 
   # Run the task.
-  ${task}_run
+  if ! dictIsSet? ${task} "subshell"; then
+    ( ${task}_run )
+  else
+    ${task}_run
+  fi
   local result=$?
 
   # Update the status.
