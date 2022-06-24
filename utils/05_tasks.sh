@@ -266,7 +266,7 @@ function run_task() {
   log_task_start ${task}
 
   # Run the task.
-  if ! dictIsSet? ${task} "subshell"; then
+  if dictIsSet? ${task} "subshell"; then
     log_info "Running in subshell."
     ( ${task}_run )
   else
