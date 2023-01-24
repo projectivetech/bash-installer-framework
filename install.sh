@@ -249,6 +249,7 @@ elif has_command_line_switch? "run"; then
 
   # Automatic installation.
   run_installation
+  exit $?
 
 else
 
